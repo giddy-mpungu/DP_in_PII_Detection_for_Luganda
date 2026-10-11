@@ -85,13 +85,44 @@ text; performance on conversational, SMS or transcribed speech is unknown.
 
 ## Usage
 
-```python
-from transformers import pipeline
-ner = pipeline("token-classification", model="{repo_id}", aggregation_strategy="simple")
-ner("ssemakula yategese ekivvulu mu buddu")
-```
+Labels use the BILOU scheme (B-, I-, L-, U-), which the pipeline's built-in aggregation does not understand,
+so merge word-level tags into spans yourself:
 
-The training text was lower-cased; lower-case your input for best results.
+```python
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+import torch
+
+tok = AutoTokenizer.from_pretrained("{repo_id}")
+model = AutoModelForTokenClassification.from_pretrained("{repo_id}").eval()
+
+def detect_pii(text):
+    words = text.lower().split()          # the training text was lower-cased
+    enc = tok(words, is_split_into_words=True, return_tensors="pt", truncation=True)
+    with torch.no_grad():
+        pred = model(**enc).logits.argmax(-1)[0].tolist()
+    tags, seen = [], set()
+    for i, w in enumerate(enc.word_ids()):
+        if w is not None and w not in seen:          # first sub-token of each word
+            seen.add(w)
+            tags.append(model.config.id2label[pred[i]])
+    spans, cur = [], None
+    for word, tag in zip(words, tags):
+        prefix, _, typ = tag.partition("-")
+        if prefix in ("B", "U") or (prefix in ("I", "L") and (cur is None or cur[0] != typ)):
+            if cur: spans.append(cur)
+            cur = [typ, [word]]
+        elif prefix in ("I", "L"):
+            cur[1].append(word)
+        else:
+            if cur: spans.append(cur)
+            cur = None
+        if prefix in ("L", "U") and cur:
+            spans.append(cur); cur = None
+    if cur: spans.append(cur)
+    return [(typ, " ".join(ws)) for typ, ws in spans]
+
+print(detect_pii("pulezidenti museveni yasisinkanye abakulembeze b ekibiina kya nrm e kampala ."))
+```
 """
     with open(os.path.join(run_dir, "release_model", "README.md"), "w", encoding="utf-8") as f:
         f.write(card)

@@ -28,6 +28,13 @@ Main findings:
   entirely under DP, because the public data does not cover them.
 * DP reduces membership-inference success from AUC ≈ 0.70 to chance.
 
+## Released models
+
+Private models trained from the public warm start, each with a model card stating its guarantee and per-category
+scores: [luganda-pii-dp-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps8) ·
+[luganda-pii-dp-eps3](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps3) ·
+[luganda-pii-dp-eps1](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps1).
+
 ## Contents
 
 | Path | What it is |
