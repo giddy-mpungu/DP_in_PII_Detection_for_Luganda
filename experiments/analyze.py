@@ -27,6 +27,16 @@ plt.rcParams.update({"font.size": 9, "axes.edgecolor": "#c3c2b7", "axes.labelcol
                      "legend.frameon": False, "pdf.fonttype": 42, "font.family": "DejaVu Sans"})
 
 
+PNG_DIR = None   # set in main(): every figure is also written as PNG for slides
+
+
+def save(fig, figs, name):
+    fig.savefig(os.path.join(figs, name + ".pdf"))
+    if PNG_DIR:
+        fig.savefig(os.path.join(PNG_DIR, name + ".png"), dpi=220)
+    plt.close(fig)
+
+
 def load(res):
     runs = {}
     for p in glob.glob(os.path.join(res, "*", "metrics.json")):
@@ -68,7 +78,10 @@ def fmt_int(n):
 
 
 def main(res, tex):
+    global PNG_DIR
     gen, figs = os.path.join(tex, "generated"), os.path.join(tex, "figures")
+    PNG_DIR = os.path.join(tex, "figures_png")
+    os.makedirs(PNG_DIR, exist_ok=True)
     os.makedirs(gen, exist_ok=True)
     os.makedirs(figs, exist_ok=True)
     runs = load(res)
@@ -116,8 +129,7 @@ def main(res, tex):
     ax.legend(ncol=3, loc="upper right")
     ax.grid(axis="x", visible=False)
     fig.tight_layout()
-    fig.savefig(os.path.join(figs, "entity_distribution.pdf"))
-    plt.close(fig)
+    save(fig, figs, "entity_distribution")
 
     # ---------------------------------------------------------------- main results
     any_dp = next((m for k in ("dp_eps8", "dp_eps3", "dp_eps1") for m in G[k]), None)
@@ -151,6 +163,7 @@ def main(res, tex):
         v = np.array(s["F"])
         macros[f"{tag}F"] = f"{v.mean():.3f}"
         macros[f"{tag}Fsd"] = f"{v.std(ddof=1):.3f}" if len(v) > 1 else "0"
+        macros[f"{tag}FPM"] = f"{v.mean():.3f}~$\\pm$~{v.std(ddof=1):.3f}" if len(v) > 1 else f"{v.mean():.3f} (one seed)"
         macros[f"{tag}Macro"] = f"{np.mean(s['M']):.3f}"
         macros[f"{tag}P"] = f"{np.mean(s['P']):.3f}"
         macros[f"{tag}R"] = f"{np.mean(s['R']):.3f}"
@@ -167,24 +180,30 @@ def main(res, tex):
         macros[f"{tag}Time"] = f"{np.mean([m['runtime_min'] for m in g]):.0f}"
     write(os.path.join(gen, "main_results_table.tex"),
           "\\begin{table}[ht]\n\\centering\n\\caption{Test-set results of the main experiment (entity level, mean $\\pm$ "
-          "standard deviation over three seeds). $\\varepsilon$ is the achieved value at $\\delta = 10^{-5}$; MIA AUC is the "
+          "standard deviation over three seeds; models started from \\texttt{xlm-roberta-base}. The private models collapsed at every learning rate and were run with seed 42 only). $\\varepsilon$ is the achieved value at $\\delta = 10^{-5}$; MIA AUC is the "
           "membership-inference attack success (0.5 = chance).}\n\\label{tab:main_results}\n\\begin{FitTable}\n"
           "\\begin{tabular}{lcccccc}\n\\toprule\nModel & $\\varepsilon$ & Precision & Recall & Micro-F1 & Macro-F1 & MIA AUC \\\\\n"
           "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
 
-    # per-type F1 and recall
+    # per-type F1 and recall: non-private (both starts) and DP from the public warm start
+    # (DP from xlm-roberta-base predicts no entities at all, so its columns would be all zero)
+    PT = [(k, h) for k, h in (("nonprivate", "Non-private\\\\(XLM-R)"), ("pub_nonprivate", "Non-private\\\\(warm start)"),
+                              ("pub_dp_eps8", "DP $\\varepsilon=8$\\\\(warm start)"), ("pub_dp_eps3", "DP $\\varepsilon=3$\\\\(warm start)"),
+                              ("pub_dp_eps1", "DP $\\varepsilon=1$\\\\(warm start)")) if group(runs, k)]
     for metric, cap, lab in (("f1", "F1-score", "tab:per_type_f1"), ("recall", "recall (share of PII found)", "tab:per_type_recall")):
         rows = []
         for t in TYPES:
             sup = next((m["test"]["per_type"][t]["support"] for g in G.values() for m in g), 0)
-            cells = [ms([m["test"]["per_type"][t][metric] for m in G[k]], 2) for k, _, _ in CONFIGS]
+            cells = [ms([m["test"]["per_type"][t][metric] for m in group(runs, k)], 2) for k, _ in PT]
             rows.append(f"{t} ({sup}) & " + " & ".join(cells) + " \\\\")
         rows.append("\\midrule\nMacro average & " + " & ".join(
-            ms([np.mean([m["test"]["per_type"][t][metric] for t in TYPES]) for m in G[k]], 2) for k, _, _ in CONFIGS) + " \\\\")
+            ms([np.mean([m["test"]["per_type"][t][metric] for t in TYPES]) for m in group(runs, k)], 2) for k, _ in PT) + " \\\\")
+        head = " & ".join("\\begin{tabular}[c]{@{}c@{}}" + h + "\\end{tabular}" for _, h in PT)
         write(os.path.join(gen, f"per_type_{metric}_table.tex"),
-              f"\\begin{{table}}[ht]\n\\centering\n\\caption{{Per-category test {cap} (mean $\\pm$ s.d.\\ over three seeds; "
-              f"test support in brackets).}}\n\\label{{{lab}}}\n\\begin{{FitTable}}\n\\begin{{tabular}}{{lcccc}}\n\\toprule\n"
-              "PII category & Non-private & $\\varepsilon=8$ & $\\varepsilon=3$ & $\\varepsilon=1$ \\\\\n\\midrule\n"
+              f"\\begin{{table}}[ht]\n\\centering\n\\caption{{Per-category test {cap} (mean $\\pm$ s.d.\\ over seeds; values without s.d.\\ come from one seed; "
+              f"test support in brackets). DP models started from \\texttt{{xlm-roberta-base}} detect no entities and are "
+              f"omitted.}}\n\\label{{{lab}}}\n\\begin{{FitTable}}\n\\begin{{tabular}}{{l{'c' * len(PT)}}}\n\\toprule\n"
+              f"PII category & {head} \\\\\n\\midrule\n"
               + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
     for k, _, _ in CONFIGS:
         tag = {"nonprivate": "Base", "dp_eps8": "EpsEight", "dp_eps3": "EpsThree", "dp_eps1": "EpsOne"}[k]
@@ -212,48 +231,55 @@ def main(res, tex):
 
     # epsilon by epoch (seed 42) + learning curves
     seed42 = {k: runs.get(f"{k}_seed42") for k, _, _ in CONFIGS}
-    if all(seed42[k] for k in ("dp_eps8", "dp_eps3", "dp_eps1")):
-        ep = len(seed42["dp_eps8"]["history"])
+    pre_e = "pub_" if all(runs.get(f"pub_dp_eps{e}_seed42") for e in (8, 3, 1)) else ""
+    eps_runs = {k: runs.get(f"{pre_e}{k}_seed42") for k in ("dp_eps8", "dp_eps3", "dp_eps1")}
+    if all(eps_runs.values()):
+        ep = len(eps_runs["dp_eps8"]["history"])
         rows = []
         for i in range(ep):
             cells = []
             for k in ("dp_eps8", "dp_eps3", "dp_eps1"):
-                h = seed42[k]["history"][i]
+                h = eps_runs[k]["history"][i]
                 cells += [f"{h['epsilon_cumulative']:.2f}", f"{h['val_entity_f1']:.3f}"]
             rows.append(f"{i + 1} & " + " & ".join(cells) + " \\\\")
         write(os.path.join(gen, "epsilon_epochs_table.tex"),
               "\\begin{table}[ht]\n\\centering\n\\caption{Cumulative privacy loss $\\varepsilon$ ($\\delta=10^{-5}$) and "
-              "validation entity micro-F1 after each epoch (seed 42). $\\varepsilon$ grows with every step and the final "
+              "validation entity micro-F1 after each epoch (seed 42" + (", public warm start" if pre_e else "") + "). $\\varepsilon$ grows with every step and the final "
               "row is the guarantee of the released model.}\n\\label{tab:eps_epochs}\n\\begin{FitTable}\n"
               "\\begin{tabular}{ccccccc}\n\\toprule\n & \\multicolumn{2}{c}{High Utility} & \\multicolumn{2}{c}{Better Privacy} "
               "& \\multicolumn{2}{c}{Strong Privacy} \\\\\n\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}\\cmidrule(lr){6-7}\n"
               "Epoch & $\\varepsilon$ & Val.\\ F1 & $\\varepsilon$ & Val.\\ F1 & $\\varepsilon$ & Val.\\ F1 \\\\\n\\midrule\n"
               + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.5))
-    for k, label, eps in CONFIGS:
-        g = G[k]
-        if not g:
-            continue
-        n = min(len(m["history"]) for m in g)
-        xs = np.arange(1, n + 1)
-        name = label if eps is None else f"$\\varepsilon$={eps}"
-        for ax, key in ((axes[0], "val_entity_f1"), (axes[1], "val_loss")):
-            arr = np.array([[m["history"][i][key] for i in range(n)] for m in g])
-            ax.plot(xs, arr.mean(0), color=COLORS[k], lw=2, label=name)
-            if len(g) > 1:
-                ax.fill_between(xs, arr.mean(0) - arr.std(0), arr.mean(0) + arr.std(0), color=COLORS[k], alpha=0.15, lw=0)
-        if eps:
-            arr = np.array([[m["history"][i]["epsilon_cumulative"] for i in range(n)] for m in g])
-            axes[2].plot(xs, arr.mean(0), color=COLORS[k], lw=2, label=name)
-    axes[0].set(title="Validation entity micro-F1", xlabel="Epoch")
-    axes[1].set(title="Validation loss", xlabel="Epoch")
-    axes[2].set(title="Cumulative $\\varepsilon$ ($\\delta=10^{-5}$)", xlabel="Epoch")
-    for ax in axes:
-        ax.title.set_size(9)
-    axes[0].legend(fontsize=7, loc="lower right")
+    families = [("XLM-R start", "")]
+    if group(runs, "pub_nonprivate"):
+        families.append(("warm start", "pub_"))
+    fig, axes = plt.subplots(len(families), 3, figsize=(7.2, 2.4 * len(families)), squeeze=False)
+    for row, (fam, pre) in enumerate(families):
+        ax_f, ax_l, ax_e = axes[row]
+        for k, label, eps in CONFIGS:
+            g = group(runs, pre + k)
+            if not g:
+                continue
+            n = min(len(m["history"]) for m in g)
+            xs = np.arange(1, n + 1)
+            name = label if eps is None else f"$\\varepsilon$={eps}"
+            for ax, key in ((ax_f, "val_entity_f1"), (ax_l, "val_loss")):
+                arr = np.array([[m["history"][i][key] for i in range(n)] for m in g])
+                ax.plot(xs, arr.mean(0), color=COLORS[k], lw=2, label=name)
+                if len(g) > 1:
+                    ax.fill_between(xs, arr.mean(0) - arr.std(0), arr.mean(0) + arr.std(0), color=COLORS[k],
+                                    alpha=0.15, lw=0)
+            if eps:
+                arr = np.array([[m["history"][i]["epsilon_cumulative"] for i in range(n)] for m in g])
+                ax_e.plot(xs, arr.mean(0), color=COLORS[k], lw=2, label=name)
+        ax_f.set(title=f"Validation micro-F1 ({fam})", xlabel="Epoch", ylim=(-0.03, 0.85))
+        ax_l.set(title=f"Validation loss ({fam})", xlabel="Epoch")
+        ax_e.set(title="Cumulative $\\varepsilon$ ($\\delta=10^{-5}$)", xlabel="Epoch")
+        for ax in axes[row]:
+            ax.title.set_size(8.5)
+        ax_f.legend(fontsize=6.5, loc="center right")
     fig.tight_layout()
-    fig.savefig(os.path.join(figs, "learning_curves.pdf"))
-    plt.close(fig)
+    save(fig, figs, "learning_curves")
 
     # ---------------------------------------------------------------- public warm start (Experiment C)
     PUB = [("pub_nonprivate", "Non-private", None), ("pub_dp_eps8", "High Utility", 8), ("pub_dp_eps3", "Better Privacy", 3),
@@ -277,6 +303,8 @@ def main(res, tex):
                "pub_dp_eps1": "PubEpsOne"}[k]
         macros[f"{tag}F"] = f"{np.mean(pub_summary[k]['F']):.3f}"
         macros[f"{tag}Fsd"] = f"{np.std(pub_summary[k]['F'], ddof=1):.3f}" if len(g) > 1 else "0"
+        macros[f"{tag}FPM"] = (f"{np.mean(pub_summary[k]['F']):.3f}~$\\pm$~{np.std(pub_summary[k]['F'], ddof=1):.3f}"
+                               if len(g) > 1 else f"{np.mean(pub_summary[k]['F']):.3f} (one seed)")
         macros[f"{tag}Macro"] = f"{np.mean(pub_summary[k]['M']):.3f}"
         macros[f"{tag}R"] = f"{np.mean([m['test']['entity_micro']['recall'] for m in g]):.3f}"
         macros[f"{tag}MIA"] = f"{np.mean([m['mia_auc_train_vs_test'] for m in g]):.3f}"
@@ -293,7 +321,7 @@ def main(res, tex):
         write(os.path.join(gen, "public_results_table.tex"),
               "\\begin{table}[ht]\n\\centering\n\\caption{Test-set results with a non-private warm start on public "
               "Luganda NER data (MasakhaNER 2.0) before fine-tuning on \\texttt{lg-ner} (mean $\\pm$ s.d.\\ over three "
-              "seeds). $\\varepsilon$ ($\\delta=10^{-5}$) covers the \\texttt{lg-ner} training sentences.}\n"
+              "seeds). $\\varepsilon$ ($\\delta=10^{-5}$) covers the \\texttt{lg-ner} training sentences. Values without a standard deviation come from a single seed (Section~\\ref{sec:training}).}\n"
               "\\label{tab:public_results}\n\\begin{FitTable}\n\\begin{tabular}{lccccc}\n\\toprule\n"
               "Model & $\\varepsilon$ & Micro-F1 & Macro-F1 & USERID F1 & MIA AUC \\\\\n\\midrule\n"
               + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
@@ -324,39 +352,44 @@ def main(res, tex):
             mu = [np.mean(summ[k]["F"]) for k in ks]
             sd = [np.std(summ[k]["F"], ddof=1) if len(summ[k]["F"]) > 1 else 0 for k in ks]
             ax.errorbar(xs, mu, yerr=sd, color=col, ls=ls, marker=mk, ms=6, lw=2, capsize=3, label=lab)
+            dy = 9 if pre else -13   # warm-start labels above the line, XLM-R labels below
             for xi, yi in zip(xs, mu):
-                ax.annotate(f"{yi:.2f}", (xi, yi), textcoords="offset points", xytext=(0, 8), ha="center",
+                ax.annotate(f"{yi:.2f}", (xi, yi), textcoords="offset points", xytext=(0, dy), ha="center",
                             fontsize=7, color=INK)
         ax.set_xticks(xs, [xl[k] for k in keys])
         ax.set_xlabel("Privacy budget $\\varepsilon$ (left = stronger privacy)")
         ax.set_ylabel("Test entity micro-F1")
-        ax.set_ylim(0, 1)
+        ax.set_ylim(-0.08, 1)
         ax.set_xlim(-0.6, len(keys) - 0.4)
-        ax.legend(loc="lower right")
+        ax.legend(loc="upper left")
         fig.tight_layout()
-        fig.savefig(os.path.join(figs, "privacy_utility.pdf"))
-        plt.close(fig)
+        save(fig, figs, "privacy_utility")
 
         # per-type F1 grouped bars
         fig, ax = plt.subplots(figsize=(6.4, 2.9))
         x = np.arange(len(TYPES))
-        present = [(k, l, e) for k, l, e in CONFIGS if G[k]]
+        present = [(k, lab, col) for k, lab, col in (("nonprivate", "Non-private (XLM-R)", "#52514e"),
+                                                     ("pub_nonprivate", "Non-private (warm start)", "#898781"),
+                                                     ("pub_dp_eps8", "DP $\\varepsilon$=8 (warm start)", "#184f95"),
+                                                     ("pub_dp_eps3", "DP $\\varepsilon$=3 (warm start)", "#3987e5"),
+                                                     ("pub_dp_eps1", "DP $\\varepsilon$=1 (warm start)", "#86b6ef"))
+                   if group(runs, k)]
         w = 0.8 / len(present)
-        for i, (k, label, eps) in enumerate(present):
-            v = [np.mean([m["test"]["per_type"][t]["f1"] for m in G[k]]) for t in TYPES]
-            ax.bar(x + (i - (len(present) - 1) / 2) * w, v, w - 0.02, color=COLORS[k],
-                   label=label if eps is None else f"$\\varepsilon$={eps}")
+        for i, (k, lab, col) in enumerate(present):
+            v = [np.mean([m["test"]["per_type"][t]["f1"] for m in group(runs, k)]) for t in TYPES]
+            ax.bar(x + (i - (len(present) - 1) / 2) * w, v, w - 0.02, color=col, label=lab)
         ax.set_xticks(x, TYPES)
         ax.set_ylabel("Test entity F1")
         ax.set_ylim(0, 1)
         ax.grid(axis="x", visible=False)
-        ax.legend(ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.16), fontsize=8)
+        ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.22), fontsize=7)
         fig.tight_layout()
-        fig.savefig(os.path.join(figs, "per_type_f1.pdf"))
-        plt.close(fig)
+        save(fig, figs, "per_type_f1")
 
     # confusion matrices (seed 42), row-normalised
-    cm_keys = [k for k in ("nonprivate", "dp_eps1") if seed42.get(k)]
+    seed42.update({k: runs.get(f"{k}_seed42") for k in ("pub_nonprivate", "pub_dp_eps8", "pub_dp_eps1")})
+    cm_keys = [k for k in ("pub_nonprivate", "pub_dp_eps8", "pub_dp_eps1") if seed42.get(k)] or \
+              [k for k in ("nonprivate", "dp_eps1") if seed42.get(k)]
     if cm_keys:
         fig, axes = plt.subplots(1, len(cm_keys), figsize=(3.4 * len(cm_keys), 3.1))
         axes = np.atleast_1d(axes)
@@ -376,14 +409,17 @@ def main(res, tex):
             ax.grid(False)
             ax.set_xlabel("Predicted")
             ax.set_ylabel("Gold")
-            ax.set_title(dict((c[0], c[1] if c[2] is None else f"{c[1]} ($\\varepsilon$={c[2]})") for c in CONFIGS)[k], fontsize=9)
+            ax.set_title({"pub_nonprivate": "Warm start, non-private", "pub_dp_eps8": "Warm start, DP $\\varepsilon$=8",
+                          "pub_dp_eps1": "Warm start, DP $\\varepsilon$=1", "nonprivate": "Non-private",
+                          "dp_eps1": "DP $\\varepsilon$=1"}[k], fontsize=9)
         fig.tight_layout()
-        fig.savefig(os.path.join(figs, "confusion_matrices.pdf"))
-        plt.close(fig)
+        save(fig, figs, "confusion_matrices")
 
     # error analysis counts (seed 42)
     rows = []
-    for k, label, eps in CONFIGS:
+    err_sets = [(k, label + (" (XLM-R start)" if eps is None else f" $\\varepsilon$={eps} (XLM-R start)")) for k, label, eps in CONFIGS] + \
+               [("pub_" + k, label + (" (warm start)" if eps is None else f" $\\varepsilon$={eps} (warm start)")) for k, label, eps in CONFIGS]
+    for k, label in err_sets:
         p = os.path.join(res, f"{k}_seed42", "errors.json")
         if not os.path.exists(p):
             continue
@@ -438,12 +474,90 @@ def main(res, tex):
                     f"{ms([m['train_summary']['entity_micro_f1'] for m in g])} & {ms([m['mia_auc_train_vs_test'] for m in g])} \\\\")
     if rows:
         write(os.path.join(gen, "repro_table.tex"),
-              "\\begin{table}[ht]\n\\centering\n\\caption{Re-run of the submitted configuration (DP fine-tuning starting "
-              "from \\texttt{luganda-ner-v6}), mean $\\pm$ s.d.\\ over three seeds. Token-weighted F1 is the metric reported "
-              "in the submitted version; entity-level scores are on the test split; train F1 is entity micro-F1 on the "
-              "training split.}\n\\label{tab:repro}\n\\begin{FitTable}\n\\begin{tabular}{lcccccc}\n\\toprule\n"
+              "\\begin{table}[ht]\n\\centering\n\\caption{The model on which the submitted version was built, "
+              "\\texttt{luganda-ner-v6}, evaluated as released. Token-weighted F1 is the metric reported in the submitted "
+              "version; entity-level scores are on the test split; train F1 is entity micro-F1 on the training split; "
+              "MIA AUC is the membership-inference attack success (0.5 = chance).}\n\\label{tab:repro}\n\\begin{FitTable}\n\\begin{tabular}{lcccccc}\n\\toprule\n"
               "Model & $\\varepsilon$ & Token-weighted F1 & Entity micro-F1 & Entity macro-F1 & Train F1 & MIA AUC \\\\\n"
               "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
+
+    # ---------------------------------------------------------------- metric illusion: token-weighted vs entity F1
+    s = sp["test"]["O_token_share"]   # a model that labels every word O: weighted F1 = s * F1(O)
+    bars = [("Predicts no PII\n(every word O)", [s * 2 * s / (1 + s)], [0.0])]
+    macros["AllOTokF"] = f"{s * 2 * s / (1 + s):.2f}"
+    if v6:
+        bars.append(("luganda-ner-v6\n(as released)", [v6["test"]["token_weighted_incl_O"]["f1"]], [f1(v6)]))
+    for tag, label in (("hu", "Submitted HU\n(re-run)"), ("sp", "Submitted SP\n(re-run)")):
+        g = group(runs, f"repro_{tag}")
+        if g:
+            bars.append((label, [m["test"]["token_weighted_incl_O"]["f1"] for m in g], [f1(m) for m in g]))
+    for k, label in (("nonprivate", "Non-private\n(clean)"), ("dp_eps8", "DP $\\varepsilon$=8\n(clean)"),
+                     ("pub_dp_eps8", "DP $\\varepsilon$=8\n(warm start)"), ("pub_dp_eps1", "DP $\\varepsilon$=1\n(warm start)")):
+        g = G.get(k) or GP.get(k) or []
+        if g:
+            bars.append((label, [m["test"]["token_weighted_incl_O"]["f1"] for m in g], [f1(m) for m in g]))
+    if bars:
+        fig, ax = plt.subplots(figsize=(7.0, 3.0))
+        x = np.arange(len(bars))
+        for i, (lab, col, key) in enumerate((("Token-weighted F1 (incl. O; submitted metric)", "#c3c2b7", 1),
+                                             ("Entity-level micro-F1 (this revision)", "#2a78d6", 2))):
+            v = [np.mean(b[key]) for b in bars]
+            ax.bar(x + (i - 0.5) * 0.38, v, 0.36, color=col, label=lab)
+            for xi, vi in zip(x, v):
+                ax.text(xi + (i - 0.5) * 0.38, vi + 0.015, f"{vi:.2f}", ha="center", fontsize=6.5, color=INK)
+        ax.set_xticks(x, [b[0] for b in bars], fontsize=7)
+        ax.set_ylim(0, 1.08)
+        ax.set_ylabel("Test F1")
+        ax.grid(axis="x", visible=False)
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.2), ncol=2, fontsize=7.5)
+        fig.tight_layout()
+        save(fig, figs, "metric_illusion")
+
+    # ---------------------------------------------------------------- membership inference: loss distributions
+    mia = [(n, lab) for n, lab in (("v6_no_further_training", "luganda-ner-v6 (non-private,\ntrained on these sentences)"),
+                                    ("pub_nonprivate_seed42", "Warm start + non-private"),
+                                    ("pub_dp_eps8_seed42", "Warm start + DP $\\varepsilon$=8"),
+                                    ("pub_dp_eps1_seed42", "Warm start + DP $\\varepsilon$=1"))
+           if os.path.exists(os.path.join(res, n, "losses.json"))]
+    if mia:
+        fig, axes = plt.subplots(1, len(mia), figsize=(2.35 * len(mia), 2.4), sharey=False)
+        axes = np.atleast_1d(axes)
+        for ax, (n, lab) in zip(axes, mia):
+            L = json.load(open(os.path.join(res, n, "losses.json")))
+            hi = np.percentile(L["test"], 98)
+            bins = np.linspace(0, max(hi, 1e-3), 30)
+            ax.hist(np.clip(L["train"], 0, hi), bins=bins, density=True, histtype="step", lw=1.6, color="#2a78d6", label="Train (members)")
+            ax.hist(np.clip(L["test"], 0, hi), bins=bins, density=True, histtype="stepfilled", color="#eb6834", alpha=0.35, label="Test (non-members)")
+            ax.set_title(f"{lab}\nAUC = {runs[n]['mia_auc_train_vs_test']:.2f}", fontsize=7.5)
+            ax.set_xlabel("Per-sentence loss", fontsize=7.5)
+            ax.set_yticks([])
+            ax.grid(False)
+        axes[0].legend(fontsize=6.5, loc="upper right")
+        fig.tight_layout()
+        save(fig, figs, "mia_losses")
+
+    # ---------------------------------------------------------------- missed-PII rate per category
+    sets = [(k, lab, col) for k, lab, col in (("nonprivate", "Non-private (clean)", "#52514e"),
+                                              ("pub_nonprivate", "Non-private (warm start)", "#898781"),
+                                              ("pub_dp_eps8", "DP $\\varepsilon$=8 (warm start)", "#184f95"),
+                                              ("pub_dp_eps3", "DP $\\varepsilon$=3 (warm start)", "#3987e5"),
+                                              ("pub_dp_eps1", "DP $\\varepsilon$=1 (warm start)", "#86b6ef"))
+            if (G.get(k) or GP.get(k))]
+    if sets:
+        fig, ax = plt.subplots(figsize=(6.6, 2.9))
+        x = np.arange(len(TYPES))
+        w = 0.8 / len(sets)
+        for i, (k, lab, col) in enumerate(sets):
+            g = G.get(k) or GP.get(k)
+            v = [100 * (1 - np.mean([m["test"]["per_type"][t]["recall"] for m in g])) for t in TYPES]
+            ax.bar(x + (i - (len(sets) - 1) / 2) * w, v, w - 0.02, color=col, label=lab)
+        ax.set_xticks(x, TYPES)
+        ax.set_ylabel("Missed PII (% of gold mentions)")
+        ax.set_ylim(0, 100)
+        ax.grid(axis="x", visible=False)
+        ax.legend(ncol=3, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, 1.22))
+        fig.tight_layout()
+        save(fig, figs, "missed_pii")
 
     # ---------------------------------------------------------------- environment
     env_src = any_dp or v6 or next(iter(runs.values()), None)
@@ -464,7 +578,7 @@ def main(res, tex):
     stems = {"Base": "", "EpsEight": "", "EpsThree": "", "EpsOne": "", "PubBase": "", "PubEpsEight": "",
              "PubEpsThree": "", "PubEpsOne": ""}
     for s in stems:
-        for suf in ("F", "Fsd", "Macro", "P", "R", "Missed", "Tok", "MIA", "CI", "Achieved", "PRV", "Drop", "Time",
+        for suf in ("F", "Fsd", "FPM", "Macro", "P", "R", "Missed", "Tok", "MIA", "CI", "Achieved", "PRV", "Drop", "Time",
                     "Sigma", "LR") + tuple(f"{t.title()}{m}" for t in TYPES for m in ("F", "R")):
             macros.setdefault(s + suf, "??")
     for tag in ("HU", "BP", "SP"):

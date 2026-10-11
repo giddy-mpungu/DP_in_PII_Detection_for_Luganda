@@ -1,0 +1,246 @@
+{
+ "config": {
+  "name": "public_warmstart",
+  "init": "xlm-roberta-base",
+  "mode": "nonprivate",
+  "train_data": "public",
+  "lr": 5e-05,
+  "batch_size": 16,
+  "physical_batch": 16,
+  "epochs": 5,
+  "freeze_embeddings": true,
+  "seed": 42,
+  "save_model": true
+ },
+ "environment": {
+  "python": "3.13.15",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.6",
+  "datasets": "4.8.5",
+  "cuda": "13.0",
+  "gpu": "Tesla T4",
+  "cpu_threads": 1,
+  "opacus": "1.6.0"
+ },
+ "device": "cuda",
+ "trainable_params": 85073689,
+ "truncated_sentences": {
+  "train": 13,
+  "validation": 0,
+  "test": 8
+ },
+ "history": [
+  {
+   "epoch": 1,
+   "train_loss": 0.4488939636154854,
+   "val_loss": 1.1214958212173196,
+   "val_entity_f1": 0.2920747996438112,
+   "val_entity_macro_f1": 0.18530488863978375,
+   "val_token_weighted_f1": 0.7491993025052596,
+   "elapsed_min": 1.5446167985598247
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.14383259257693506,
+   "val_loss": 1.1751752258028039,
+   "val_entity_f1": 0.2835820895522388,
+   "val_entity_macro_f1": 0.17341978195803817,
+   "val_token_weighted_f1": 0.7527162142168675,
+   "elapsed_min": 2.912606155872345
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.09061593461094551,
+   "val_loss": 1.1657692948175795,
+   "val_entity_f1": 0.30185873605947955,
+   "val_entity_macro_f1": 0.17031175500938436,
+   "val_token_weighted_f1": 0.7609066620526291,
+   "elapsed_min": 4.271373045444489
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.06036846182824483,
+   "val_loss": 1.3576626672097136,
+   "val_entity_f1": 0.3309222423146474,
+   "val_entity_macro_f1": 0.18320601413424856,
+   "val_token_weighted_f1": 0.7572588348790545,
+   "elapsed_min": 5.644412577152252
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.056070481634225615,
+   "val_loss": 1.262952871568707,
+   "val_entity_f1": 0.33670033670033667,
+   "val_entity_macro_f1": 0.22194563666249975,
+   "val_token_weighted_f1": 0.7692744981388169,
+   "elapsed_min": 7.003598324457804
+  }
+ ],
+ "privacy": {},
+ "test": {
+  "per_type": {
+   "PERSON": {
+    "precision": 0.16511627906976745,
+    "recall": 0.17233009708737865,
+    "f1": 0.168646080760095,
+    "support": 412,
+    "missed": 341,
+    "spurious": 359
+   },
+   "NORP": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 98,
+    "missed": 98,
+    "spurious": 0
+   },
+   "DATE": {
+    "precision": 0.017241379310344827,
+    "recall": 0.023255813953488372,
+    "f1": 0.019801980198019802,
+    "support": 43,
+    "missed": 42,
+    "spurious": 57
+   },
+   "USERID": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 22,
+    "missed": 22,
+    "spurious": 0
+   },
+   "ORG": {
+    "precision": 0.20606060606060606,
+    "recall": 0.2982456140350877,
+    "f1": 0.24372759856630818,
+    "support": 114,
+    "missed": 80,
+    "spurious": 131
+   },
+   "LOCATION": {
+    "precision": 0.6096491228070176,
+    "recall": 0.4826388888888889,
+    "f1": 0.5387596899224806,
+    "support": 288,
+    "missed": 149,
+    "spurious": 89
+   }
+  },
+  "entity_micro": {
+   "precision": 0.27809307604994327,
+   "recall": 0.2507676560900716,
+   "f1": 0.26372443487621094,
+   "n_gold": 977,
+   "n_pred": 881,
+   "n_correct": 245
+  },
+  "entity_macro_f1": 0.16182255824115058,
+  "entity_micro_f1_ci95": [
+   0.2365895634877469,
+   0.2930134019844283
+  ],
+  "token_weighted_incl_O": {
+   "precision": 0.7654427485237313,
+   "recall": 0.8090826931766832,
+   "f1": 0.7715783240697056
+  },
+  "token_macro_excl_O": {
+   "precision": 0.2418260264306653,
+   "recall": 0.16964670664003037,
+   "f1": 0.1825289178808294
+  },
+  "token_accuracy": 0.8090826931766832,
+  "confusion_matrix": {
+   "labels": [
+    "O",
+    "PERSON",
+    "NORP",
+    "DATE",
+    "USERID",
+    "ORG",
+    "LOCATION"
+   ],
+   "matrix": [
+    [
+     10090,
+     156,
+     0,
+     79,
+     0,
+     30,
+     40
+    ],
+    [
+     883,
+     565,
+     0,
+     1,
+     0,
+     3,
+     6
+    ],
+    [
+     43,
+     3,
+     0,
+     1,
+     0,
+     135,
+     0
+    ],
+    [
+     94,
+     5,
+     0,
+     47,
+     0,
+     0,
+     0
+    ],
+    [
+     196,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     233,
+     12,
+     0,
+     0,
+     0,
+     105,
+     19
+    ],
+    [
+     271,
+     33,
+     0,
+     0,
+     0,
+     12,
+     216
+    ]
+   ]
+  }
+ },
+ "train_summary": {
+  "entity_micro_f1": 0.31583683263347334,
+  "token_weighted_f1": 0.7777308903909298,
+  "mean_loss": 1.167066399997524
+ },
+ "validation_summary": {
+  "entity_micro_f1": 0.33670033670033667,
+  "entity_macro_f1": 0.22194563666249975,
+  "mean_loss": 1.262952871568707
+ },
+ "mia_auc_train_vs_test": 0.49984251404846275,
+ "runtime_min": 7.49314048687617
+}

@@ -1,0 +1,43 @@
+{
+ "train": {
+  "sentences_with_duplicates_file": 4869,
+  "unique_sentences": 2287,
+  "copies_per_sentence": {
+   "1": 485,
+   "2": 1031,
+   "3": 766,
+   "4": 2,
+   "5": 2,
+   "6": 1
+  },
+  "released_sentences": 2085
+ },
+ "val": {
+  "sentences_with_duplicates_file": 835,
+  "unique_sentences": 736,
+  "copies_per_sentence": {
+   "1": 643,
+   "2": 87,
+   "3": 6
+  },
+  "released_sentences": 358
+ },
+ "test": {
+  "sentences_with_duplicates_file": 1252,
+  "unique_sentences": 1039,
+  "copies_per_sentence": {
+   "1": 836,
+   "2": 193,
+   "3": 10
+  },
+  "released_sentences": 536
+ },
+ "agreement": {
+  "sentences_annotated_more_than_once": 2315,
+  "annotation_pairs": 6895,
+  "identical_pairs_share": 0.8951414068165338,
+  "token_type_cohen_kappa": 0.9724730009050718,
+  "entity_pairwise_f1": 0.9548421780201213,
+  "note": "kappa over word-level entity type (O/PERSON/...); entity F1 = exact span+type match between copies"
+ }
+}

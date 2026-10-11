@@ -16,8 +16,12 @@ Usage
     python dp_pii_luganda.py --plan main --only dp_eps8_seed42 --out results
 """
 import argparse
+import gc
 import json
 import os
+
+# many runs share one process: let the CUDA allocator reuse fragmented memory between them
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 import platform
 import random
 import sys
@@ -52,6 +56,7 @@ MAX_LEN = 128
 # ----------------------------------------------------------------------------------------------
 MAIN_LRS = (2e-4, 5e-4, 1e-3)
 PUB_LRS = (5e-5, 2e-4, 5e-4)
+PE_LRS = (1e-3, 3e-3)
 
 
 def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
@@ -77,6 +82,20 @@ def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
                     runs.append(dict(name=f"pub_dp_eps{eps:g}_seed{s}", init=warm, mode="dp", target_epsilon=eps,
                                      max_grad_norm=1.0, lr=pub_lr, batch_size=64, physical_batch=16, epochs=15,
                                      freeze_embeddings=True, seed=s, release=(s == 42)))
+    if plan in ("public_pe", "all"):
+        # Experiment D: as C, but DP updates only the top transformer layers and the classifier head.
+        # Fewer trainable coordinates means less total noise for the same (eps, delta) (Yu et al., 2022).
+        warm = os.path.join(out, "public_warmstart", "model")
+        pe = dict(init=warm, mode="dp", max_grad_norm=1.0, batch_size=128, physical_batch=32, epochs=20,
+                  freeze_embeddings=True, train_top_layers=2)
+        for lr in PE_LRS:
+            runs.append(dict(pe, name=f"pub_pe_lrsweep_eps8_lr{lr:g}", target_epsilon=8.0, lr=lr, seed=42,
+                             sweep=True))
+        if pub_lr is not None:
+            for eps in (8.0, 3.0, 1.0):
+                for s in seeds:
+                    runs.append(dict(pe, name=f"pub_pe_dp_eps{eps:g}_seed{s}", target_epsilon=eps, lr=pub_lr,
+                                     seed=s, release=(s == 42)))
     if plan in ("leakage", "repro", "all"):
         # The model used in the submitted thesis, evaluated without any further training.
         runs.append(dict(name="v6_no_further_training", init=V6_MODEL, mode="eval_only", seed=42))
@@ -88,7 +107,9 @@ def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
         for tag, sigma, clip in orig:
             for s in seeds[:1]:
                 runs.append(dict(name=f"repro_{tag}_seed{s}", init=V6_MODEL, mode="dp", noise_multiplier=sigma,
-                                 max_grad_norm=clip, lr=5e-5, batch_size=8, physical_batch=8, epochs=5,
+                                 # physical batch 2 as in the original code: per-example gradients of the
+                                 # trainable 192M-parameter embedding matrix do not fit a T4 at 8
+                                 max_grad_norm=clip, lr=5e-5, batch_size=8, physical_batch=2, epochs=5,
                                  freeze_embeddings=False, seed=s))
     if plan in ("main", "all"):
         # Experiment B: clean backbone. Non-private baseline + three privacy levels set by target epsilon.
@@ -438,6 +459,16 @@ def set_seed(seed):
 # One run
 # ----------------------------------------------------------------------------------------------
 def run(cfg, splits, out, device, public=None):
+    try:
+        _run(cfg, splits, out, device, public)
+    finally:
+        # release the model, optimizer and Opacus state before the next run in this process
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+
+def _run(cfg, splits, out, device, public=None):
     from transformers import AutoModelForTokenClassification, AutoTokenizer
 
     rdir = os.path.join(out, cfg["name"])
@@ -461,6 +492,13 @@ def run(cfg, splits, out, device, public=None):
     if cfg.get("freeze_embeddings"):
         for p in model.base_model.embeddings.parameters():
             p.requires_grad = False
+    if cfg.get("train_top_layers"):
+        for p in model.parameters():
+            p.requires_grad = False
+        for p in model.base_model.encoder.layer[-cfg["train_top_layers"]:].parameters():
+            p.requires_grad = True
+        for p in model.classifier.parameters():
+            p.requires_grad = True
     n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     history, privacy = [], {}
@@ -624,7 +662,7 @@ def audit(splits, out):
 # ----------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plan", default="all", choices=["audit", "leakage", "repro", "main", "public", "all"])
+    ap.add_argument("--plan", default="all", choices=["audit", "leakage", "repro", "main", "public", "public_pe", "all"])
     ap.add_argument("--out", default="results")
     ap.add_argument("--only", default=None, help="comma-separated run names")
     ap.add_argument("--dp_lr", type=float, default=None, help="override the learning rate picked by the sweep")
@@ -668,9 +706,16 @@ def main():
                 return
             lr = best[0]
             print(f"Selected DP learning rate for {plan}: {lr:g} (validation entity F1 {best[1]:.4f})")
+        collapsed = a.dp_lr is None and best[1] < 0.01
         with open(os.path.join(a.out, f"selected_lr_{plan}.json"), "w") as f:
-            json.dump({"lr": lr}, f)
-        go([r for r in plan_runs(plan, out=a.out, **{kw: lr}) if r["name"].startswith(run_prefix)])
+            json.dump({"lr": lr, "best_val_entity_f1": None if a.dp_lr else best[1], "collapsed": collapsed}, f)
+        runs = [r for r in plan_runs(plan, out=a.out, **{kw: lr}) if r["name"].startswith(run_prefix)]
+        if collapsed:
+            # every learning rate left the model predicting no entities at the loosest budget (eps=8); stricter
+            # budgets cannot do better, so one seed per budget documents the collapse without wasting GPU time
+            print(f"{plan}: DP training collapsed at every learning rate; running seed 42 only.")
+            runs = [r for r in runs if r["seed"] == 42]
+        go(runs)
 
     if a.plan in ("main", "all"):
         go(plan_runs("main", out=a.out))
@@ -678,6 +723,9 @@ def main():
     if a.plan in ("public", "all"):
         go(plan_runs("public", out=a.out))
         dp_stage("pub_lrsweep", PUB_LRS, "public", "pub_lr", "pub_dp_")
+    if a.plan in ("public_pe", "all"):
+        go(plan_runs("public_pe", out=a.out))
+        dp_stage("pub_pe_lrsweep", PE_LRS, "public_pe", "pub_lr", "pub_pe_dp_")
     if a.plan in ("leakage", "repro", "all"):
         go(plan_runs("repro" if a.plan == "all" else a.plan, out=a.out))
 

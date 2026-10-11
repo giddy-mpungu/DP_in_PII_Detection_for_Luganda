@@ -1,0 +1,12 @@
+{
+ "train": {
+  "original": 4942,
+  "dropped_overlap_with_lg_ner": 0,
+  "kept": 4942
+ },
+ "validation": {
+  "original": 706,
+  "dropped_overlap_with_lg_ner": 0,
+  "kept": 706
+ }
+}
