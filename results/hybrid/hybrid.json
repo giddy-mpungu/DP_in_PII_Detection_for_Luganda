@@ -1,0 +1,3419 @@
+{
+ "rule_types": [
+  "USERID",
+  "DATE"
+ ],
+ "rules_only": {
+  "train": {
+   "USERID": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 122,
+    "missed": 0,
+    "spurious": 0,
+    "lenient_f1": 1.0
+   },
+   "DATE": {
+    "precision": 0.8333333333333334,
+    "recall": 0.6967213114754098,
+    "f1": 0.7589285714285715,
+    "support": 122,
+    "missed": 37,
+    "spurious": 17,
+    "lenient_f1": 0.9066267710991815
+   }
+  },
+  "validation": {
+   "USERID": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 22,
+    "missed": 0,
+    "spurious": 0,
+    "lenient_f1": 1.0
+   },
+   "DATE": {
+    "precision": 0.782608695652174,
+    "recall": 0.8571428571428571,
+    "f1": 0.8181818181818182,
+    "support": 21,
+    "missed": 3,
+    "spurious": 5,
+    "lenient_f1": 0.9322974472807991
+   }
+  },
+  "test": {
+   "USERID": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 22,
+    "missed": 0,
+    "spurious": 0,
+    "lenient_f1": 1.0
+   },
+   "DATE": {
+    "precision": 0.6857142857142857,
+    "recall": 0.5581395348837209,
+    "f1": 0.6153846153846154,
+    "support": 43,
+    "missed": 19,
+    "spurious": 11,
+    "lenient_f1": 0.899338721528288
+   }
+  }
+ },
+ "runs": {
+  "pub_dp_eps1_seed1234": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.29896907216494845,
+     "recall": 0.2968270214943705,
+     "f1": 0.2978941961992809,
+     "n_gold": 977,
+     "n_pred": 970,
+     "n_correct": 290
+    },
+    "entity_macro_f1": 0.1726624967316738,
+    "entity_micro_f1_ci95": [
+     0.2694234691688799,
+     0.32710973831844686
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.23140495867768596,
+      "recall": 0.27184466019417475,
+      "f1": 0.25,
+      "support": 412,
+      "missed": 300,
+      "spurious": 372
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.022727272727272728,
+      "recall": 0.023255813953488372,
+      "f1": 0.022988505747126436,
+      "support": 43,
+      "missed": 42,
+      "spurious": 43
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1650943396226415,
+      "recall": 0.30701754385964913,
+      "f1": 0.2147239263803681,
+      "support": 114,
+      "missed": 79,
+      "spurious": 177
+     },
+     "LOCATION": {
+      "precision": 0.6173913043478261,
+      "recall": 0.4930555555555556,
+      "f1": 0.5482625482625483,
+      "support": 288,
+      "missed": 146,
+      "spurious": 88
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7004132231404959,
+      "recall": 0.7257281553398058,
+      "f1": 0.7128460110273434
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.45454545454545453,
+      "recall": 0.3953488372093023,
+      "f1": 0.42288557213930345
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.3113207547169811,
+      "recall": 0.5350877192982456,
+      "f1": 0.39362534219788814
+     },
+     "LOCATION": {
+      "precision": 0.8130434782608695,
+      "recall": 0.6388888888888888,
+      "f1": 0.7155215438363001
+     },
+     "all": {
+      "precision": 0.6309278350515464,
+      "recall": 0.5742067553735927,
+      "f1": 0.601232472983835
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3425357873210634,
+     "recall": 0.3428863868986694,
+     "f1": 0.3427109974424552,
+     "n_gold": 977,
+     "n_pred": 978,
+     "n_correct": 335
+    },
+    "entity_macro_f1": 0.4384254392343818,
+    "entity_micro_f1_ci95": [
+     0.3108870305046699,
+     0.3741332041404036
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.23333333333333334,
+      "recall": 0.27184466019417475,
+      "f1": 0.25112107623318386,
+      "support": 412,
+      "missed": 300,
+      "spurious": 368
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1650943396226415,
+      "recall": 0.30701754385964913,
+      "f1": 0.2147239263803681,
+      "support": 114,
+      "missed": 79,
+      "spurious": 177
+     },
+     "LOCATION": {
+      "precision": 0.6200873362445415,
+      "recall": 0.4930555555555556,
+      "f1": 0.5493230174081237,
+      "support": 288,
+      "missed": 146,
+      "spurious": 87
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.70625,
+      "recall": 0.7257281553398058,
+      "f1": 0.7158566040933938
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3113207547169811,
+      "recall": 0.5350877192982456,
+      "f1": 0.39362534219788814
+     },
+     "LOCATION": {
+      "precision": 0.8165938864628821,
+      "recall": 0.6388888888888888,
+      "f1": 0.7168930744228684
+     },
+     "all": {
+      "precision": 0.6625766871165644,
+      "recall": 0.6161719549641761,
+      "f1": 0.6385323263373961
+     }
+    }
+   }
+  },
+  "pub_dp_eps1_seed2024": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.296875,
+     "recall": 0.2917093142272262,
+     "f1": 0.29426948890036136,
+     "n_gold": 977,
+     "n_pred": 960,
+     "n_correct": 285
+    },
+    "entity_macro_f1": 0.17029024322528455,
+    "entity_micro_f1_ci95": [
+     0.26496685794821995,
+     0.3243022328548644
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.22745098039215686,
+      "recall": 0.2815533980582524,
+      "f1": 0.25162689804772237,
+      "support": 412,
+      "missed": 296,
+      "spurious": 394
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.019230769230769232,
+      "recall": 0.023255813953488372,
+      "f1": 0.021052631578947368,
+      "support": 43,
+      "missed": 42,
+      "spurious": 51
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1834319526627219,
+      "recall": 0.2719298245614035,
+      "f1": 0.21908127208480563,
+      "support": 114,
+      "missed": 83,
+      "spurious": 138
+     },
+     "LOCATION": {
+      "precision": 0.5982532751091703,
+      "recall": 0.4756944444444444,
+      "f1": 0.5299806576402321,
+      "support": 288,
+      "missed": 151,
+      "spurious": 92
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6843137254901961,
+      "recall": 0.7305825242718447,
+      "f1": 0.7066916023653036
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.4423076923076923,
+      "recall": 0.4418604651162791,
+      "f1": 0.4420839656044512
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.3609467455621302,
+      "recall": 0.47368421052631576,
+      "f1": 0.4097014925373134
+     },
+     "LOCATION": {
+      "precision": 0.8296943231441049,
+      "recall": 0.6423611111111112,
+      "f1": 0.7241077406396458
+     },
+     "all": {
+      "precision": 0.6489583333333333,
+      "recall": 0.5721596724667349,
+      "f1": 0.6081439888379663
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.34554973821989526,
+     "recall": 0.33776867963152507,
+     "f1": 0.3416149068322981,
+     "n_gold": 977,
+     "n_pred": 955,
+     "n_correct": 330
+    },
+    "entity_macro_f1": 0.4371035078261467,
+    "entity_micro_f1_ci95": [
+     0.30831214216018443,
+     0.37259191533569264
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.2297029702970297,
+      "recall": 0.2815533980582524,
+      "f1": 0.2529989094874591,
+      "support": 412,
+      "missed": 296,
+      "spurious": 389
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1834319526627219,
+      "recall": 0.2719298245614035,
+      "f1": 0.21908127208480563,
+      "support": 114,
+      "missed": 83,
+      "spurious": 138
+     },
+     "LOCATION": {
+      "precision": 0.6116071428571429,
+      "recall": 0.4756944444444444,
+      "f1": 0.53515625,
+      "support": 288,
+      "missed": 151,
+      "spurious": 87
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.691089108910891,
+      "recall": 0.7305825242718447,
+      "f1": 0.7102872616999051
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3609467455621302,
+      "recall": 0.47368421052631576,
+      "f1": 0.4097014925373134
+     },
+     "LOCATION": {
+      "precision": 0.8482142857142857,
+      "recall": 0.6423611111111112,
+      "f1": 0.7310732113144759
+     },
+     "all": {
+      "precision": 0.6869109947643979,
+      "recall": 0.6120777891504606,
+      "f1": 0.6473388657774493
+     }
+    }
+   }
+  },
+  "pub_dp_eps1_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.31309904153354634,
+     "recall": 0.300921187308086,
+     "f1": 0.30688935281837165,
+     "n_gold": 977,
+     "n_pred": 939,
+     "n_correct": 294
+    },
+    "entity_macro_f1": 0.17653309895739314,
+    "entity_micro_f1_ci95": [
+     0.2753257266802379,
+     0.3400826149778082
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.2399193548387097,
+      "recall": 0.28883495145631066,
+      "f1": 0.2621145374449339,
+      "support": 412,
+      "missed": 293,
+      "spurious": 377
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.027777777777777776,
+      "recall": 0.023255813953488372,
+      "f1": 0.025316455696202528,
+      "support": 43,
+      "missed": 42,
+      "spurious": 35
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.18435754189944134,
+      "recall": 0.2894736842105263,
+      "f1": 0.22525597269624573,
+      "support": 114,
+      "missed": 81,
+      "spurious": 146
+     },
+     "LOCATION": {
+      "precision": 0.618421052631579,
+      "recall": 0.4895833333333333,
+      "f1": 0.5465116279069767,
+      "support": 288,
+      "missed": 147,
+      "spurious": 87
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6895161290322581,
+      "recall": 0.7257281553398058,
+      "f1": 0.7071588614422837
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.4444444444444444,
+      "recall": 0.32558139534883723,
+      "f1": 0.3758389261744966
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.3407821229050279,
+      "recall": 0.4649122807017544,
+      "f1": 0.39328507998296935
+     },
+     "LOCATION": {
+      "precision": 0.8245614035087719,
+      "recall": 0.6458333333333334,
+      "f1": 0.724335073328362
+     },
+     "all": {
+      "precision": 0.6464323748668797,
+      "recall": 0.5649948822927329,
+      "f1": 0.6029763345501531
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3553459119496855,
+     "recall": 0.34698055271238487,
+     "f1": 0.35111341273951324,
+     "n_gold": 977,
+     "n_pred": 954,
+     "n_correct": 339
+    },
+    "entity_macro_f1": 0.44209217610996104,
+    "entity_micro_f1_ci95": [
+     0.31719574219841257,
+     0.3855836073228551
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.241869918699187,
+      "recall": 0.28883495145631066,
+      "f1": 0.2632743362831858,
+      "support": 412,
+      "missed": 293,
+      "spurious": 373
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.18435754189944134,
+      "recall": 0.2894736842105263,
+      "f1": 0.22525597269624573,
+      "support": 114,
+      "missed": 81,
+      "spurious": 146
+     },
+     "LOCATION": {
+      "precision": 0.6238938053097345,
+      "recall": 0.4895833333333333,
+      "f1": 0.5486381322957198,
+      "support": 288,
+      "missed": 147,
+      "spurious": 85
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6951219512195121,
+      "recall": 0.7257281553398058,
+      "f1": 0.7100954126911379
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3407821229050279,
+      "recall": 0.4649122807017544,
+      "f1": 0.39328507998296935
+     },
+     "LOCATION": {
+      "precision": 0.831858407079646,
+      "recall": 0.6458333333333334,
+      "f1": 0.7271366188396755
+     },
+     "all": {
+      "precision": 0.6781970649895178,
+      "recall": 0.6100307062436029,
+      "f1": 0.6423103798358129
+     }
+    }
+   }
+  },
+  "pub_dp_eps3_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.3374358974358974,
+     "recall": 0.3367451381780962,
+     "f1": 0.3370901639344262,
+     "n_gold": 977,
+     "n_pred": 975,
+     "n_correct": 329
+    },
+    "entity_macro_f1": 0.1932126291376766,
+    "entity_micro_f1_ci95": [
+     0.3061059036713108,
+     0.3696733114209696
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.2827868852459016,
+      "recall": 0.33495145631067963,
+      "f1": 0.30666666666666664,
+      "support": 412,
+      "missed": 274,
+      "spurious": 350
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.023809523809523808,
+      "recall": 0.023255813953488372,
+      "f1": 0.023529411764705882,
+      "support": 43,
+      "missed": 42,
+      "spurious": 41
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.21359223300970873,
+      "recall": 0.38596491228070173,
+      "f1": 0.27499999999999997,
+      "support": 114,
+      "missed": 70,
+      "spurious": 162
+     },
+     "LOCATION": {
+      "precision": 0.6108786610878661,
+      "recall": 0.5069444444444444,
+      "f1": 0.554079696394687,
+      "support": 288,
+      "missed": 142,
+      "spurious": 93
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7069672131147541,
+      "recall": 0.7524271844660194,
+      "f1": 0.728989162292959
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.47619047619047616,
+      "recall": 0.4186046511627907,
+      "f1": 0.44554455445544555
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.33980582524271846,
+      "recall": 0.5526315789473685,
+      "f1": 0.4208416833667335
+     },
+     "LOCATION": {
+      "precision": 0.8284518828451883,
+      "recall": 0.6701388888888888,
+      "f1": 0.7409331950247695
+     },
+     "all": {
+      "precision": 0.6492307692307693,
+      "recall": 0.5977482088024565,
+      "f1": 0.6224267389322308
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3800813008130081,
+     "recall": 0.3828045035823951,
+     "f1": 0.3814380418154003,
+     "n_gold": 977,
+     "n_pred": 984,
+     "n_correct": 374
+    },
+    "entity_macro_f1": 0.45906924641395935,
+    "entity_micro_f1_ci95": [
+     0.3473398198879023,
+     0.41433548494053607
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.28512396694214875,
+      "recall": 0.33495145631067963,
+      "f1": 0.3080357142857143,
+      "support": 412,
+      "missed": 274,
+      "spurious": 346
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.2146341463414634,
+      "recall": 0.38596491228070173,
+      "f1": 0.27586206896551724,
+      "support": 114,
+      "missed": 70,
+      "spurious": 161
+     },
+     "LOCATION": {
+      "precision": 0.6134453781512605,
+      "recall": 0.5069444444444444,
+      "f1": 0.5551330798479087,
+      "support": 288,
+      "missed": 142,
+      "spurious": 92
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7128099173553719,
+      "recall": 0.7524271844660194,
+      "f1": 0.7320829625573276
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.34146341463414637,
+      "recall": 0.5526315789473685,
+      "f1": 0.42211055276381915
+     },
+     "LOCATION": {
+      "precision": 0.8319327731092437,
+      "recall": 0.6701388888888888,
+      "f1": 0.7423221119291361
+     },
+     "all": {
+      "precision": 0.6798780487804879,
+      "recall": 0.638689866939611,
+      "f1": 0.6586406590571847
+     }
+    }
+   }
+  },
+  "pub_dp_eps8_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.364613880742913,
+     "recall": 0.38178096212896623,
+     "f1": 0.37300000000000005,
+     "n_gold": 977,
+     "n_pred": 1023,
+     "n_correct": 373
+    },
+    "entity_macro_f1": 0.21191893737514175,
+    "entity_micro_f1_ci95": [
+     0.3417638025761753,
+     0.40687656221504664
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.3504273504273504,
+      "recall": 0.39805825242718446,
+      "f1": 0.37272727272727274,
+      "support": 412,
+      "missed": 248,
+      "spurious": 304
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.02127659574468085,
+      "recall": 0.023255813953488372,
+      "f1": 0.02222222222222222,
+      "support": 43,
+      "missed": 42,
+      "spurious": 46
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 26
+     },
+     "ORG": {
+      "precision": 0.22972972972972974,
+      "recall": 0.4473684210526316,
+      "f1": 0.3035714285714286,
+      "support": 114,
+      "missed": 63,
+      "spurious": 171
+     },
+     "LOCATION": {
+      "precision": 0.6038461538461538,
+      "recall": 0.5451388888888888,
+      "f1": 0.5729927007299269,
+      "support": 288,
+      "missed": 131,
+      "spurious": 103
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7307692307692307,
+      "recall": 0.7597087378640777,
+      "f1": 0.7449580358261305
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.46808510638297873,
+      "recall": 0.4186046511627907,
+      "f1": 0.4419642857142857
+     },
+     "USERID": {
+      "precision": 0.8846153846153846,
+      "recall": 0.9090909090909091,
+      "f1": 0.8966861598440545
+     },
+     "ORG": {
+      "precision": 0.35135135135135137,
+      "recall": 0.6403508771929824,
+      "f1": 0.4537413339708344
+     },
+     "LOCATION": {
+      "precision": 0.8115384615384615,
+      "recall": 0.7152777777777778,
+      "f1": 0.7603736617451542
+     },
+     "all": {
+      "precision": 0.6608015640273704,
+      "recall": 0.6448311156601843,
+      "f1": 0.6527186648908534
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.4175824175824176,
+     "recall": 0.4278403275332651,
+     "f1": 0.42264914054600605,
+     "n_gold": 977,
+     "n_pred": 1001,
+     "n_correct": 418
+    },
+    "entity_macro_f1": 0.4781593471530332,
+    "entity_micro_f1_ci95": [
+     0.38795550629342906,
+     0.45594931503884695
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.35268817204301073,
+      "recall": 0.39805825242718446,
+      "f1": 0.3740022805017104,
+      "support": 412,
+      "missed": 248,
+      "spurious": 301
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.23076923076923078,
+      "recall": 0.4473684210526316,
+      "f1": 0.3044776119402985,
+      "support": 114,
+      "missed": 63,
+      "spurious": 170
+     },
+     "LOCATION": {
+      "precision": 0.6085271317829457,
+      "recall": 0.5451388888888888,
+      "f1": 0.575091575091575,
+      "support": 288,
+      "missed": 131,
+      "spurious": 101
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7354838709677419,
+      "recall": 0.7597087378640777,
+      "f1": 0.7474000607437973
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.35294117647058826,
+      "recall": 0.6403508771929824,
+      "f1": 0.45506493506493506
+     },
+     "LOCATION": {
+      "precision": 0.8178294573643411,
+      "recall": 0.7152777777777778,
+      "f1": 0.7631237051862777
+     },
+     "all": {
+      "precision": 0.6863136863136863,
+      "recall": 0.6653019447287615,
+      "f1": 0.6756444949460944
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps1_seed1234": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.2766415500538213,
+     "recall": 0.263050153531218,
+     "f1": 0.2696747114375656,
+     "n_gold": 977,
+     "n_pred": 929,
+     "n_correct": 257
+    },
+    "entity_macro_f1": 0.1659941123554204,
+    "entity_micro_f1_ci95": [
+     0.24220038120111326,
+     0.300547341931425
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16129032258064516,
+      "recall": 0.1941747572815534,
+      "f1": 0.17621145374449337,
+      "support": 412,
+      "missed": 332,
+      "spurious": 416
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.05714285714285714,
+      "recall": 0.046511627906976744,
+      "f1": 0.05128205128205128,
+      "support": 43,
+      "missed": 41,
+      "spurious": 33
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1986754966887417,
+      "recall": 0.2631578947368421,
+      "f1": 0.22641509433962265,
+      "support": 114,
+      "missed": 84,
+      "spurious": 121
+     },
+     "LOCATION": {
+      "precision": 0.5870445344129555,
+      "recall": 0.5034722222222222,
+      "f1": 0.5420560747663551,
+      "support": 288,
+      "missed": 143,
+      "spurious": 102
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.655241935483871,
+      "recall": 0.6650485436893204,
+      "f1": 0.6601088197358083
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.45714285714285713,
+      "recall": 0.3023255813953488,
+      "f1": 0.3639545056867891
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.33112582781456956,
+      "recall": 0.40350877192982454,
+      "f1": 0.36375138383678635
+     },
+     "LOCATION": {
+      "precision": 0.7854251012145749,
+      "recall": 0.6527777777777778,
+      "f1": 0.7129843218516637
+     },
+     "all": {
+      "precision": 0.6297093649085038,
+      "recall": 0.5332650972364381,
+      "f1": 0.5774882194563234
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.31751054852320676,
+     "recall": 0.30808597748208805,
+     "f1": 0.31272727272727274,
+     "n_gold": 977,
+     "n_pred": 948,
+     "n_correct": 301
+    },
+    "entity_macro_f1": 0.42677522743351504,
+    "entity_micro_f1_ci95": [
+     0.28235037370913446,
+     0.3462193491347082
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16227180527383367,
+      "recall": 0.1941747572815534,
+      "f1": 0.1767955801104972,
+      "support": 412,
+      "missed": 332,
+      "spurious": 413
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1986754966887417,
+      "recall": 0.2631578947368421,
+      "f1": 0.22641509433962265,
+      "support": 114,
+      "missed": 84,
+      "spurious": 121
+     },
+     "LOCATION": {
+      "precision": 0.5870445344129555,
+      "recall": 0.5034722222222222,
+      "f1": 0.5420560747663551,
+      "support": 288,
+      "missed": 143,
+      "spurious": 102
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6592292089249493,
+      "recall": 0.6650485436893204,
+      "f1": 0.6621260902216505
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.33112582781456956,
+      "recall": 0.40350877192982454,
+      "f1": 0.36375138383678635
+     },
+     "LOCATION": {
+      "precision": 0.7854251012145749,
+      "recall": 0.6527777777777778,
+      "f1": 0.7129843218516637
+     },
+     "all": {
+      "precision": 0.6592827004219409,
+      "recall": 0.579324462640737,
+      "f1": 0.6167227310487424
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps1_seed2024": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.29493087557603687,
+     "recall": 0.26202661207778916,
+     "f1": 0.2775067750677507,
+     "n_gold": 977,
+     "n_pred": 868,
+     "n_correct": 256
+    },
+    "entity_macro_f1": 0.171587276965223,
+    "entity_micro_f1_ci95": [
+     0.2498592168812833,
+     0.3084260796647425
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18222222222222223,
+      "recall": 0.19902912621359223,
+      "f1": 0.19025522041763343,
+      "support": 412,
+      "missed": 330,
+      "spurious": 368
+     },
+     "NORP": {
+      "precision": 1.0,
+      "recall": 0.02040816326530612,
+      "f1": 0.039999999999999994,
+      "support": 98,
+      "missed": 96,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.07407407407407407,
+      "recall": 0.046511627906976744,
+      "f1": 0.05714285714285714,
+      "support": 43,
+      "missed": 41,
+      "spurious": 25
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1793103448275862,
+      "recall": 0.22807017543859648,
+      "f1": 0.20077220077220076,
+      "support": 114,
+      "missed": 88,
+      "spurious": 119
+     },
+     "LOCATION": {
+      "precision": 0.5901639344262295,
+      "recall": 0.5,
+      "f1": 0.5413533834586466,
+      "support": 288,
+      "missed": 144,
+      "spurious": 100
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.68,
+      "recall": 0.6577669902912622,
+      "f1": 0.6686987444662168
+     },
+     "NORP": {
+      "precision": 1.0,
+      "recall": 0.02040816326530612,
+      "f1": 0.039999999999999994
+     },
+     "DATE": {
+      "precision": 0.48148148148148145,
+      "recall": 0.2558139534883721,
+      "f1": 0.33411214953271035
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.3448275862068966,
+      "recall": 0.39473684210526316,
+      "f1": 0.3680981595092025
+     },
+     "LOCATION": {
+      "precision": 0.7950819672131147,
+      "recall": 0.6423611111111112,
+      "f1": 0.7106086405575576
+     },
+     "all": {
+      "precision": 0.6509216589861752,
+      "recall": 0.526100307062436,
+      "f1": 0.5818924277443328
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.33482142857142855,
+     "recall": 0.3070624360286592,
+     "f1": 0.3203416978109984,
+     "n_gold": 977,
+     "n_pred": 896,
+     "n_correct": 300
+    },
+    "entity_macro_f1": 0.4313679790056779,
+    "entity_micro_f1_ci95": [
+     0.2897420782659055,
+     0.35397357048863587
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18303571428571427,
+      "recall": 0.19902912621359223,
+      "f1": 0.19069767441860463,
+      "support": 412,
+      "missed": 330,
+      "spurious": 366
+     },
+     "NORP": {
+      "precision": 1.0,
+      "recall": 0.02040816326530612,
+      "f1": 0.039999999999999994,
+      "support": 98,
+      "missed": 96,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1793103448275862,
+      "recall": 0.22807017543859648,
+      "f1": 0.20077220077220076,
+      "support": 114,
+      "missed": 88,
+      "spurious": 119
+     },
+     "LOCATION": {
+      "precision": 0.5901639344262295,
+      "recall": 0.5,
+      "f1": 0.5413533834586466,
+      "support": 288,
+      "missed": 144,
+      "spurious": 100
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6830357142857143,
+      "recall": 0.6577669902912622,
+      "f1": 0.6701632455147891
+     },
+     "NORP": {
+      "precision": 1.0,
+      "recall": 0.02040816326530612,
+      "f1": 0.039999999999999994
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3448275862068966,
+      "recall": 0.39473684210526316,
+      "f1": 0.3680981595092025
+     },
+     "LOCATION": {
+      "precision": 0.7950819672131147,
+      "recall": 0.6423611111111112,
+      "f1": 0.7106086405575576
+     },
+     "all": {
+      "precision": 0.6785714285714286,
+      "recall": 0.5742067553735927,
+      "f1": 0.6220419596743604
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps1_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.28901734104046245,
+     "recall": 0.25588536335721596,
+     "f1": 0.2714440825190011,
+     "n_gold": 977,
+     "n_pred": 865,
+     "n_correct": 250
+    },
+    "entity_macro_f1": 0.16667041839129823,
+    "entity_micro_f1_ci95": [
+     0.24399952793174706,
+     0.3039975199108567
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.17937219730941703,
+      "recall": 0.1941747572815534,
+      "f1": 0.18648018648018647,
+      "support": 412,
+      "missed": 332,
+      "spurious": 366
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.09090909090909091,
+      "recall": 0.06976744186046512,
+      "f1": 0.07894736842105264,
+      "support": 43,
+      "missed": 40,
+      "spurious": 30
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.17567567567567569,
+      "recall": 0.22807017543859648,
+      "f1": 0.19847328244274806,
+      "support": 114,
+      "missed": 88,
+      "spurious": 122
+     },
+     "LOCATION": {
+      "precision": 0.592436974789916,
+      "recall": 0.4895833333333333,
+      "f1": 0.5361216730038022,
+      "support": 288,
+      "missed": 147,
+      "spurious": 97
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.695067264573991,
+      "recall": 0.6480582524271845,
+      "f1": 0.6707401074545588
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.45454545454545453,
+      "recall": 0.27906976744186046,
+      "f1": 0.345821325648415
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "ORG": {
+      "precision": 0.35135135135135137,
+      "recall": 0.41228070175438597,
+      "f1": 0.37938528407326916
+     },
+     "LOCATION": {
+      "precision": 0.8109243697478992,
+      "recall": 0.6388888888888888,
+      "f1": 0.7146997262920624
+     },
+     "all": {
+      "precision": 0.6589595375722543,
+      "recall": 0.5220061412487206,
+      "f1": 0.5825417818925093
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3306997742663657,
+     "recall": 0.2998976458546571,
+     "f1": 0.3145464304884595,
+     "n_gold": 977,
+     "n_pred": 886,
+     "n_correct": 293
+    },
+    "entity_macro_f1": 0.42285234562585705,
+    "entity_micro_f1_ci95": [
+     0.2854155225726143,
+     0.34872479392329175
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18058690744920994,
+      "recall": 0.1941747572815534,
+      "f1": 0.1871345029239766,
+      "support": 412,
+      "missed": 332,
+      "spurious": 363
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 98,
+      "missed": 98,
+      "spurious": 0
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.17567567567567569,
+      "recall": 0.22807017543859648,
+      "f1": 0.19847328244274806,
+      "support": 114,
+      "missed": 88,
+      "spurious": 122
+     },
+     "LOCATION": {
+      "precision": 0.592436974789916,
+      "recall": 0.4895833333333333,
+      "f1": 0.5361216730038022,
+      "support": 288,
+      "missed": 147,
+      "spurious": 97
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6997742663656885,
+      "recall": 0.6480582524271845,
+      "f1": 0.6729240938044967
+     },
+     "NORP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.35135135135135137,
+      "recall": 0.41228070175438597,
+      "f1": 0.37938528407326916
+     },
+     "LOCATION": {
+      "precision": 0.8109243697478992,
+      "recall": 0.6388888888888888,
+      "f1": 0.7146997262920624
+     },
+     "all": {
+      "precision": 0.6896162528216704,
+      "recall": 0.5690890481064483,
+      "f1": 0.6235821150314391
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps3_seed1234": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.2914714151827554,
+     "recall": 0.31832139201637666,
+     "f1": 0.3043052837573385,
+     "n_gold": 977,
+     "n_pred": 1067,
+     "n_correct": 311
+    },
+    "entity_macro_f1": 0.2595358672520981,
+    "entity_micro_f1_ci95": [
+     0.2736095462299127,
+     0.3365934294722424
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.1688073394495413,
+      "recall": 0.22330097087378642,
+      "f1": 0.19226750261233022,
+      "support": 412,
+      "missed": 320,
+      "spurious": 453
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.3673469387755102,
+      "f1": 0.5070422535211268,
+      "support": 98,
+      "missed": 62,
+      "spurious": 8
+     },
+     "DATE": {
+      "precision": 0.09090909090909091,
+      "recall": 0.06976744186046512,
+      "f1": 0.07894736842105264,
+      "support": 43,
+      "missed": 40,
+      "spurious": 30
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 34
+     },
+     "ORG": {
+      "precision": 0.1949685534591195,
+      "recall": 0.2719298245614035,
+      "f1": 0.2271062271062271,
+      "support": 114,
+      "missed": 83,
+      "spurious": 128
+     },
+     "LOCATION": {
+      "precision": 0.5912698412698413,
+      "recall": 0.5173611111111112,
+      "f1": 0.5518518518518518,
+      "support": 288,
+      "missed": 139,
+      "spurious": 103
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.673394495412844,
+      "recall": 0.7014563106796117,
+      "f1": 0.6871390208902234
+     },
+     "NORP": {
+      "precision": 0.8636363636363636,
+      "recall": 0.3877551020408163,
+      "f1": 0.5352112676056339
+     },
+     "DATE": {
+      "precision": 0.45454545454545453,
+      "recall": 0.27906976744186046,
+      "f1": 0.345821325648415
+     },
+     "USERID": {
+      "precision": 0.6470588235294118,
+      "recall": 1.0,
+      "f1": 0.7857142857142858
+     },
+     "ORG": {
+      "precision": 0.39622641509433965,
+      "recall": 0.5175438596491229,
+      "f1": 0.4488317333816338
+     },
+     "LOCATION": {
+      "precision": 0.8015873015873016,
+      "recall": 0.6701388888888888,
+      "f1": 0.7299928846946035
+     },
+     "all": {
+      "precision": 0.662605435801312,
+      "recall": 0.6274309109518935,
+      "f1": 0.6445386337103383
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.33618233618233617,
+     "recall": 0.3623336745138178,
+     "f1": 0.3487684729064039,
+     "n_gold": 977,
+     "n_pred": 1053,
+     "n_correct": 354
+    },
+    "entity_macro_f1": 0.5158486691047669,
+    "entity_micro_f1_ci95": [
+     0.3147964396634246,
+     0.3826281594713247
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16974169741697417,
+      "recall": 0.22330097087378642,
+      "f1": 0.1928721174004193,
+      "support": 412,
+      "missed": 320,
+      "spurious": 450
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.3673469387755102,
+      "f1": 0.5070422535211268,
+      "support": 98,
+      "missed": 62,
+      "spurious": 8
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.1962025316455696,
+      "recall": 0.2719298245614035,
+      "f1": 0.22794117647058823,
+      "support": 114,
+      "missed": 83,
+      "spurious": 127
+     },
+     "LOCATION": {
+      "precision": 0.5912698412698413,
+      "recall": 0.5173611111111112,
+      "f1": 0.5518518518518518,
+      "support": 288,
+      "missed": 139,
+      "spurious": 103
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6771217712177122,
+      "recall": 0.7014563106796117,
+      "f1": 0.6890742653698976
+     },
+     "NORP": {
+      "precision": 0.8636363636363636,
+      "recall": 0.3877551020408163,
+      "f1": 0.5352112676056339
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3987341772151899,
+      "recall": 0.5175438596491229,
+      "f1": 0.45043625787687835
+     },
+     "LOCATION": {
+      "precision": 0.8015873015873016,
+      "recall": 0.6701388888888888,
+      "f1": 0.7299928846946035
+     },
+     "all": {
+      "precision": 0.6894586894586895,
+      "recall": 0.6519959058341863,
+      "f1": 0.6702041863306241
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps3_seed2024": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.295968534906588,
+     "recall": 0.30808597748208805,
+     "f1": 0.30190571715145437,
+     "n_gold": 977,
+     "n_pred": 1017,
+     "n_correct": 301
+    },
+    "entity_macro_f1": 0.2399509672024084,
+    "entity_micro_f1_ci95": [
+     0.2724142406706259,
+     0.33334158415841586
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.17485265225933203,
+      "recall": 0.21601941747572814,
+      "f1": 0.19326818675352878,
+      "support": 412,
+      "missed": 323,
+      "spurious": 420
+     },
+     "NORP": {
+      "precision": 0.6481481481481481,
+      "recall": 0.35714285714285715,
+      "f1": 0.4605263157894737,
+      "support": 98,
+      "missed": 63,
+      "spurious": 19
+     },
+     "DATE": {
+      "precision": 0.043478260869565216,
+      "recall": 0.023255813953488372,
+      "f1": 0.030303030303030304,
+      "support": 43,
+      "missed": 42,
+      "spurious": 22
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 39
+     },
+     "ORG": {
+      "precision": 0.18115942028985507,
+      "recall": 0.21929824561403508,
+      "f1": 0.1984126984126984,
+      "support": 114,
+      "missed": 89,
+      "spurious": 113
+     },
+     "LOCATION": {
+      "precision": 0.594488188976378,
+      "recall": 0.5243055555555556,
+      "f1": 0.5571955719557196,
+      "support": 288,
+      "missed": 137,
+      "spurious": 103
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6895874263261297,
+      "recall": 0.6868932038834952,
+      "f1": 0.6882376783679013
+     },
+     "NORP": {
+      "precision": 0.7037037037037037,
+      "recall": 0.3877551020408163,
+      "f1": 0.5
+     },
+     "DATE": {
+      "precision": 0.4782608695652174,
+      "recall": 0.23255813953488372,
+      "f1": 0.3129445234708393
+     },
+     "USERID": {
+      "precision": 0.5897435897435898,
+      "recall": 1.0,
+      "f1": 0.7419354838709677
+     },
+     "ORG": {
+      "precision": 0.35507246376811596,
+      "recall": 0.38596491228070173,
+      "f1": 0.36987476411048203
+     },
+     "LOCATION": {
+      "precision": 0.7992125984251969,
+      "recall": 0.6736111111111112,
+      "f1": 0.7310562465193986
+     },
+     "all": {
+      "precision": 0.6637168141592921,
+      "recall": 0.6049129989764586,
+      "f1": 0.6329520627168744
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.34393638170974156,
+     "recall": 0.3541453428863869,
+     "f1": 0.34896621280887546,
+     "n_gold": 977,
+     "n_pred": 1006,
+     "n_correct": 346
+    },
+    "entity_macro_f1": 0.5043424534446984,
+    "entity_micro_f1_ci95": [
+     0.31813262291709127,
+     0.381741969766889
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.17693836978131214,
+      "recall": 0.21601941747572814,
+      "f1": 0.19453551912568307,
+      "support": 412,
+      "missed": 323,
+      "spurious": 414
+     },
+     "NORP": {
+      "precision": 0.6481481481481481,
+      "recall": 0.35714285714285715,
+      "f1": 0.4605263157894737,
+      "support": 98,
+      "missed": 63,
+      "spurious": 19
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.18115942028985507,
+      "recall": 0.21929824561403508,
+      "f1": 0.1984126984126984,
+      "support": 114,
+      "missed": 89,
+      "spurious": 113
+     },
+     "LOCATION": {
+      "precision": 0.594488188976378,
+      "recall": 0.5243055555555556,
+      "f1": 0.5571955719557196,
+      "support": 288,
+      "missed": 137,
+      "spurious": 103
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6978131212723658,
+      "recall": 0.6868932038834952,
+      "f1": 0.6923101048574546
+     },
+     "NORP": {
+      "precision": 0.7037037037037037,
+      "recall": 0.3877551020408163,
+      "f1": 0.5
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.35507246376811596,
+      "recall": 0.38596491228070173,
+      "f1": 0.36987476411048203
+     },
+     "LOCATION": {
+      "precision": 0.7992125984251969,
+      "recall": 0.6736111111111112,
+      "f1": 0.7310562465193986
+     },
+     "all": {
+      "precision": 0.6928429423459245,
+      "recall": 0.631525076765609,
+      "f1": 0.66076450961879
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps3_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.3024390243902439,
+     "recall": 0.3172978505629478,
+     "f1": 0.30969030969030964,
+     "n_gold": 977,
+     "n_pred": 1025,
+     "n_correct": 310
+    },
+    "entity_macro_f1": 0.2673958223320548,
+    "entity_micro_f1_ci95": [
+     0.27864421872391204,
+     0.34066071045695523
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16091954022988506,
+      "recall": 0.20388349514563106,
+      "f1": 0.17987152034261245,
+      "support": 412,
+      "missed": 328,
+      "spurious": 438
+     },
+     "NORP": {
+      "precision": 0.95,
+      "recall": 0.3877551020408163,
+      "f1": 0.5507246376811594,
+      "support": 98,
+      "missed": 60,
+      "spurious": 2
+     },
+     "DATE": {
+      "precision": 0.09090909090909091,
+      "recall": 0.046511627906976744,
+      "f1": 0.06153846153846154,
+      "support": 43,
+      "missed": 41,
+      "spurious": 20
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 35
+     },
+     "ORG": {
+      "precision": 0.22602739726027396,
+      "recall": 0.2894736842105263,
+      "f1": 0.25384615384615383,
+      "support": 114,
+      "missed": 81,
+      "spurious": 113
+     },
+     "LOCATION": {
+      "precision": 0.5884615384615385,
+      "recall": 0.53125,
+      "f1": 0.5583941605839415,
+      "support": 288,
+      "missed": 135,
+      "spurious": 107
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6781609195402298,
+      "recall": 0.6771844660194175,
+      "f1": 0.6776723410386777
+     },
+     "NORP": {
+      "precision": 0.975,
+      "recall": 0.3979591836734694,
+      "f1": 0.5652173913043478
+     },
+     "DATE": {
+      "precision": 0.5909090909090909,
+      "recall": 0.2558139534883721,
+      "f1": 0.35705368289637957
+     },
+     "USERID": {
+      "precision": 0.6285714285714286,
+      "recall": 1.0,
+      "f1": 0.7719298245614035
+     },
+     "ORG": {
+      "precision": 0.4520547945205479,
+      "recall": 0.5,
+      "f1": 0.474820143884892
+     },
+     "LOCATION": {
+      "precision": 0.7884615384615384,
+      "recall": 0.6805555555555556,
+      "f1": 0.7305454545454545
+     },
+     "all": {
+      "precision": 0.6819512195121952,
+      "recall": 0.6182190378710338,
+      "f1": 0.6485231059666381
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.34739941118743867,
+     "recall": 0.3623336745138178,
+     "f1": 0.35470941883767537,
+     "n_gold": 977,
+     "n_pred": 1019,
+     "n_correct": 354
+    },
+    "entity_macro_f1": 0.5266948801604193,
+    "entity_micro_f1_ci95": [
+     0.3208092448918623,
+     0.38747900701632165
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16247582205029013,
+      "recall": 0.20388349514563106,
+      "f1": 0.18083961248654468,
+      "support": 412,
+      "missed": 328,
+      "spurious": 433
+     },
+     "NORP": {
+      "precision": 0.95,
+      "recall": 0.3877551020408163,
+      "f1": 0.5507246376811594,
+      "support": 98,
+      "missed": 60,
+      "spurious": 2
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.22758620689655173,
+      "recall": 0.2894736842105263,
+      "f1": 0.2548262548262548,
+      "support": 114,
+      "missed": 81,
+      "spurious": 112
+     },
+     "LOCATION": {
+      "precision": 0.5884615384615385,
+      "recall": 0.53125,
+      "f1": 0.5583941605839415,
+      "support": 288,
+      "missed": 135,
+      "spurious": 107
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6847195357833655,
+      "recall": 0.6771844660194175,
+      "f1": 0.6809311560855041
+     },
+     "NORP": {
+      "precision": 0.975,
+      "recall": 0.3979591836734694,
+      "f1": 0.5652173913043478
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.45517241379310347,
+      "recall": 0.5,
+      "f1": 0.47653429602888087
+     },
+     "LOCATION": {
+      "precision": 0.7884615384615384,
+      "recall": 0.6805555555555556,
+      "f1": 0.7305454545454545
+     },
+     "all": {
+      "precision": 0.7065750736015701,
+      "recall": 0.6438075742067554,
+      "f1": 0.67373256738553
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps8_seed1234": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.3057324840764331,
+     "recall": 0.34390992835209827,
+     "f1": 0.3236994219653179,
+     "n_gold": 977,
+     "n_pred": 1099,
+     "n_correct": 336
+    },
+    "entity_macro_f1": 0.280376993485628,
+    "entity_micro_f1_ci95": [
+     0.293359794996162,
+     0.35606452014977796
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.1828358208955224,
+      "recall": 0.23786407766990292,
+      "f1": 0.20675105485232068,
+      "support": 412,
+      "missed": 314,
+      "spurious": 438
+     },
+     "NORP": {
+      "precision": 0.7580645161290323,
+      "recall": 0.47959183673469385,
+      "f1": 0.5874999999999999,
+      "support": 98,
+      "missed": 51,
+      "spurious": 15
+     },
+     "DATE": {
+      "precision": 0.13043478260869565,
+      "recall": 0.06976744186046512,
+      "f1": 0.09090909090909091,
+      "support": 43,
+      "missed": 40,
+      "spurious": 20
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 40
+     },
+     "ORG": {
+      "precision": 0.20348837209302326,
+      "recall": 0.30701754385964913,
+      "f1": 0.24475524475524477,
+      "support": 114,
+      "missed": 79,
+      "spurious": 137
+     },
+     "LOCATION": {
+      "precision": 0.575187969924812,
+      "recall": 0.53125,
+      "f1": 0.5523465703971119,
+      "support": 288,
+      "missed": 135,
+      "spurious": 113
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6865671641791045,
+      "recall": 0.7111650485436893,
+      "f1": 0.6986496643599512
+     },
+     "NORP": {
+      "precision": 0.8225806451612904,
+      "recall": 0.5204081632653061,
+      "f1": 0.6375000000000001
+     },
+     "DATE": {
+      "precision": 0.4782608695652174,
+      "recall": 0.23255813953488372,
+      "f1": 0.3129445234708393
+     },
+     "USERID": {
+      "precision": 0.55,
+      "recall": 1.0,
+      "f1": 0.7096774193548387
+     },
+     "ORG": {
+      "precision": 0.46511627906976744,
+      "recall": 0.5964912280701754,
+      "f1": 0.5226748654880861
+     },
+     "LOCATION": {
+      "precision": 0.7857142857142857,
+      "recall": 0.6944444444444444,
+      "f1": 0.7372654155495978
+     },
+     "all": {
+      "precision": 0.6742493175614195,
+      "recall": 0.6591606960081884,
+      "f1": 0.6666196367568081
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3493087557603687,
+     "recall": 0.38792221084953943,
+     "f1": 0.3676042677012609,
+     "n_gold": 977,
+     "n_pred": 1085,
+     "n_correct": 379
+    },
+    "entity_macro_f1": 0.5355643839464138,
+    "entity_micro_f1_ci95": [
+     0.335365366504572,
+     0.3996269987568265
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18455743879472694,
+      "recall": 0.23786407766990292,
+      "f1": 0.20784729586426298,
+      "support": 412,
+      "missed": 314,
+      "spurious": 433
+     },
+     "NORP": {
+      "precision": 0.7704918032786885,
+      "recall": 0.47959183673469385,
+      "f1": 0.5911949685534591,
+      "support": 98,
+      "missed": 51,
+      "spurious": 14
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.2046783625730994,
+      "recall": 0.30701754385964913,
+      "f1": 0.24561403508771926,
+      "support": 114,
+      "missed": 79,
+      "spurious": 136
+     },
+     "LOCATION": {
+      "precision": 0.5773584905660377,
+      "recall": 0.53125,
+      "f1": 0.5533453887884267,
+      "support": 288,
+      "missed": 135,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6930320150659134,
+      "recall": 0.7111650485436893,
+      "f1": 0.7019814517625382
+     },
+     "NORP": {
+      "precision": 0.8360655737704918,
+      "recall": 0.5204081632653061,
+      "f1": 0.6415094339622642
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.4678362573099415,
+      "recall": 0.5964912280701754,
+      "f1": 0.5243878928089454
+     },
+     "LOCATION": {
+      "precision": 0.7886792452830189,
+      "recall": 0.6944444444444444,
+      "f1": 0.738568096685278
+     },
+     "all": {
+      "precision": 0.7041474654377881,
+      "recall": 0.6857727737973388,
+      "f1": 0.694838663262245
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps8_seed2024": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.2962962962962963,
+     "recall": 0.33572159672466734,
+     "f1": 0.3147792706333973,
+     "n_gold": 977,
+     "n_pred": 1107,
+     "n_correct": 328
+    },
+    "entity_macro_f1": 0.2526138477965869,
+    "entity_micro_f1_ci95": [
+     0.28385776128633267,
+     0.34559280962019046
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18083182640144665,
+      "recall": 0.24271844660194175,
+      "f1": 0.20725388601036268,
+      "support": 412,
+      "missed": 312,
+      "spurious": 453
+     },
+     "NORP": {
+      "precision": 0.625,
+      "recall": 0.45918367346938777,
+      "f1": 0.5294117647058825,
+      "support": 98,
+      "missed": 53,
+      "spurious": 27
+     },
+     "DATE": {
+      "precision": 0.05263157894736842,
+      "recall": 0.023255813953488372,
+      "f1": 0.03225806451612903,
+      "support": 43,
+      "missed": 42,
+      "spurious": 18
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 41
+     },
+     "ORG": {
+      "precision": 0.15789473684210525,
+      "recall": 0.21052631578947367,
+      "f1": 0.18045112781954886,
+      "support": 114,
+      "missed": 90,
+      "spurious": 128
+     },
+     "LOCATION": {
+      "precision": 0.5851851851851851,
+      "recall": 0.5486111111111112,
+      "f1": 0.5663082437275986,
+      "support": 288,
+      "missed": 130,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.674502712477396,
+      "recall": 0.7087378640776699,
+      "f1": 0.6911966289282632
+     },
+     "NORP": {
+      "precision": 0.6805555555555556,
+      "recall": 0.5,
+      "f1": 0.5764705882352942
+     },
+     "DATE": {
+      "precision": 0.5789473684210527,
+      "recall": 0.23255813953488372,
+      "f1": 0.3318250377073907
+     },
+     "USERID": {
+      "precision": 0.5609756097560976,
+      "recall": 1.0,
+      "f1": 0.71875
+     },
+     "ORG": {
+      "precision": 0.4144736842105263,
+      "recall": 0.4824561403508772,
+      "f1": 0.4458885600308841
+     },
+     "LOCATION": {
+      "precision": 0.7851851851851852,
+      "recall": 0.6979166666666666,
+      "f1": 0.7389834035690132
+     },
+     "all": {
+      "precision": 0.6603432700993677,
+      "recall": 0.6438075742067554,
+      "f1": 0.6519705917801615
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3406392694063927,
+     "recall": 0.38178096212896623,
+     "f1": 0.36003861003861004,
+     "n_gold": 977,
+     "n_pred": 1095,
+     "n_correct": 373
+    },
+    "entity_macro_f1": 0.5173562634175864,
+    "entity_micro_f1_ci95": [
+     0.3273227593982895,
+     0.3940425098770722
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.18315018315018314,
+      "recall": 0.24271844660194175,
+      "f1": 0.20876826722338204,
+      "support": 412,
+      "missed": 312,
+      "spurious": 446
+     },
+     "NORP": {
+      "precision": 0.6338028169014085,
+      "recall": 0.45918367346938777,
+      "f1": 0.5325443786982249,
+      "support": 98,
+      "missed": 53,
+      "spurious": 26
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.15894039735099338,
+      "recall": 0.21052631578947367,
+      "f1": 0.1811320754716981,
+      "support": 114,
+      "missed": 90,
+      "spurious": 127
+     },
+     "LOCATION": {
+      "precision": 0.5851851851851851,
+      "recall": 0.5486111111111112,
+      "f1": 0.5663082437275986,
+      "support": 288,
+      "missed": 130,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6831501831501832,
+      "recall": 0.7087378640776699,
+      "f1": 0.6957088289024874
+     },
+     "NORP": {
+      "precision": 0.6901408450704225,
+      "recall": 0.5,
+      "f1": 0.5798816568047337
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.41721854304635764,
+      "recall": 0.4824561403508772,
+      "f1": 0.44747207335184347
+     },
+     "LOCATION": {
+      "precision": 0.7851851851851852,
+      "recall": 0.6979166666666666,
+      "f1": 0.7389834035690132
+     },
+     "all": {
+      "precision": 0.6876712328767123,
+      "recall": 0.6704196519959058,
+      "f1": 0.6789358705931422
+     }
+    }
+   }
+  },
+  "pub_pe_dp_eps8_seed42": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.3129186602870813,
+     "recall": 0.33469805527123847,
+     "f1": 0.3234421364985163,
+     "n_gold": 977,
+     "n_pred": 1045,
+     "n_correct": 327
+    },
+    "entity_macro_f1": 0.27851543867860146,
+    "entity_micro_f1_ci95": [
+     0.29181589984141243,
+     0.35576994549058477
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.17984189723320157,
+      "recall": 0.220873786407767,
+      "f1": 0.1982570806100218,
+      "support": 412,
+      "missed": 321,
+      "spurious": 415
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.45918367346938777,
+      "f1": 0.5882352941176471,
+      "support": 98,
+      "missed": 53,
+      "spurious": 10
+     },
+     "DATE": {
+      "precision": 0.1,
+      "recall": 0.046511627906976744,
+      "f1": 0.06349206349206349,
+      "support": 43,
+      "missed": 41,
+      "spurious": 18
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 48
+     },
+     "ORG": {
+      "precision": 0.23333333333333334,
+      "recall": 0.30701754385964913,
+      "f1": 0.2651515151515152,
+      "support": 114,
+      "missed": 79,
+      "spurious": 115
+     },
+     "LOCATION": {
+      "precision": 0.5789473684210527,
+      "recall": 0.5347222222222222,
+      "f1": 0.555956678700361,
+      "support": 288,
+      "missed": 134,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7094861660079052,
+      "recall": 0.6747572815533981,
+      "f1": 0.6916860722998448
+     },
+     "NORP": {
+      "precision": 0.8727272727272727,
+      "recall": 0.4897959183673469,
+      "f1": 0.6274509803921569
+     },
+     "DATE": {
+      "precision": 0.65,
+      "recall": 0.27906976744186046,
+      "f1": 0.39048811013767215
+     },
+     "USERID": {
+      "precision": 0.4583333333333333,
+      "recall": 1.0,
+      "f1": 0.6285714285714286
+     },
+     "ORG": {
+      "precision": 0.4533333333333333,
+      "recall": 0.5263157894736842,
+      "f1": 0.48710601719197705
+     },
+     "LOCATION": {
+      "precision": 0.7781954887218046,
+      "recall": 0.6840277777777778,
+      "f1": 0.7280794158081738
+     },
+     "all": {
+      "precision": 0.6861244019138756,
+      "recall": 0.631525076765609,
+      "f1": 0.6576935256312096
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3612463485881207,
+     "recall": 0.3797338792221085,
+     "f1": 0.37025948103792417,
+     "n_gold": 977,
+     "n_pred": 1027,
+     "n_correct": 371
+    },
+    "entity_macro_f1": 0.5375496145881477,
+    "entity_micro_f1_ci95": [
+     0.3356122439611087,
+     0.40372802858138007
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.182,
+      "recall": 0.220873786407767,
+      "f1": 0.19956140350877194,
+      "support": 412,
+      "missed": 321,
+      "spurious": 409
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.45918367346938777,
+      "f1": 0.5882352941176471,
+      "support": 98,
+      "missed": 53,
+      "spurious": 10
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.2348993288590604,
+      "recall": 0.30701754385964913,
+      "f1": 0.2661596958174905,
+      "support": 114,
+      "missed": 79,
+      "spurious": 114
+     },
+     "LOCATION": {
+      "precision": 0.5789473684210527,
+      "recall": 0.5347222222222222,
+      "f1": 0.555956678700361,
+      "support": 288,
+      "missed": 134,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.718,
+      "recall": 0.6747572815533981,
+      "f1": 0.695707334755392
+     },
+     "NORP": {
+      "precision": 0.8727272727272727,
+      "recall": 0.4897959183673469,
+      "f1": 0.6274509803921569
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.4563758389261745,
+      "recall": 0.5263157894736842,
+      "f1": 0.48885693745506825
+     },
+     "LOCATION": {
+      "precision": 0.7781954887218046,
+      "recall": 0.6840277777777778,
+      "f1": 0.7280794158081738
+     },
+     "all": {
+      "precision": 0.7185978578383642,
+      "recall": 0.6560900716479018,
+      "f1": 0.6859228337174562
+     }
+    }
+   }
+  },
+  "pub_pe_lrsweep_eps8_lr0.001": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.3129186602870813,
+     "recall": 0.33469805527123847,
+     "f1": 0.3234421364985163,
+     "n_gold": 977,
+     "n_pred": 1045,
+     "n_correct": 327
+    },
+    "entity_macro_f1": 0.27851543867860146,
+    "entity_micro_f1_ci95": [
+     0.29181589984141243,
+     0.35576994549058477
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.17984189723320157,
+      "recall": 0.220873786407767,
+      "f1": 0.1982570806100218,
+      "support": 412,
+      "missed": 321,
+      "spurious": 415
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.45918367346938777,
+      "f1": 0.5882352941176471,
+      "support": 98,
+      "missed": 53,
+      "spurious": 10
+     },
+     "DATE": {
+      "precision": 0.1,
+      "recall": 0.046511627906976744,
+      "f1": 0.06349206349206349,
+      "support": 43,
+      "missed": 41,
+      "spurious": 18
+     },
+     "USERID": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 22,
+      "missed": 22,
+      "spurious": 48
+     },
+     "ORG": {
+      "precision": 0.23333333333333334,
+      "recall": 0.30701754385964913,
+      "f1": 0.2651515151515152,
+      "support": 114,
+      "missed": 79,
+      "spurious": 115
+     },
+     "LOCATION": {
+      "precision": 0.5789473684210527,
+      "recall": 0.5347222222222222,
+      "f1": 0.555956678700361,
+      "support": 288,
+      "missed": 134,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.7094861660079052,
+      "recall": 0.6747572815533981,
+      "f1": 0.6916860722998448
+     },
+     "NORP": {
+      "precision": 0.8727272727272727,
+      "recall": 0.4897959183673469,
+      "f1": 0.6274509803921569
+     },
+     "DATE": {
+      "precision": 0.65,
+      "recall": 0.27906976744186046,
+      "f1": 0.39048811013767215
+     },
+     "USERID": {
+      "precision": 0.4583333333333333,
+      "recall": 1.0,
+      "f1": 0.6285714285714286
+     },
+     "ORG": {
+      "precision": 0.4533333333333333,
+      "recall": 0.5263157894736842,
+      "f1": 0.48710601719197705
+     },
+     "LOCATION": {
+      "precision": 0.7781954887218046,
+      "recall": 0.6840277777777778,
+      "f1": 0.7280794158081738
+     },
+     "all": {
+      "precision": 0.6861244019138756,
+      "recall": 0.631525076765609,
+      "f1": 0.6576935256312096
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.3612463485881207,
+     "recall": 0.3797338792221085,
+     "f1": 0.37025948103792417,
+     "n_gold": 977,
+     "n_pred": 1027,
+     "n_correct": 371
+    },
+    "entity_macro_f1": 0.5375496145881477,
+    "entity_micro_f1_ci95": [
+     0.3356122439611087,
+     0.40372802858138007
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.182,
+      "recall": 0.220873786407767,
+      "f1": 0.19956140350877194,
+      "support": 412,
+      "missed": 321,
+      "spurious": 409
+     },
+     "NORP": {
+      "precision": 0.8181818181818182,
+      "recall": 0.45918367346938777,
+      "f1": 0.5882352941176471,
+      "support": 98,
+      "missed": 53,
+      "spurious": 10
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.2348993288590604,
+      "recall": 0.30701754385964913,
+      "f1": 0.2661596958174905,
+      "support": 114,
+      "missed": 79,
+      "spurious": 114
+     },
+     "LOCATION": {
+      "precision": 0.5789473684210527,
+      "recall": 0.5347222222222222,
+      "f1": 0.555956678700361,
+      "support": 288,
+      "missed": 134,
+      "spurious": 112
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.718,
+      "recall": 0.6747572815533981,
+      "f1": 0.695707334755392
+     },
+     "NORP": {
+      "precision": 0.8727272727272727,
+      "recall": 0.4897959183673469,
+      "f1": 0.6274509803921569
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.4563758389261745,
+      "recall": 0.5263157894736842,
+      "f1": 0.48885693745506825
+     },
+     "LOCATION": {
+      "precision": 0.7781954887218046,
+      "recall": 0.6840277777777778,
+      "f1": 0.7280794158081738
+     },
+     "all": {
+      "precision": 0.7185978578383642,
+      "recall": 0.6560900716479018,
+      "f1": 0.6859228337174562
+     }
+    }
+   }
+  },
+  "pub_pe_lrsweep_eps8_lr0.003": {
+   "model_only": {
+    "entity_micro": {
+     "precision": 0.23327759197324416,
+     "recall": 0.28556806550665303,
+     "f1": 0.2567878508973769,
+     "n_gold": 977,
+     "n_pred": 1196,
+     "n_correct": 279
+    },
+    "entity_macro_f1": 0.19262184340248314,
+    "entity_micro_f1_ci95": [
+     0.22837518565377632,
+     0.28558568393721234
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16049382716049382,
+      "recall": 0.220873786407767,
+      "f1": 0.18590398365679262,
+      "support": 412,
+      "missed": 321,
+      "spurious": 476
+     },
+     "NORP": {
+      "precision": 0.56,
+      "recall": 0.2857142857142857,
+      "f1": 0.37837837837837834,
+      "support": 98,
+      "missed": 70,
+      "spurious": 22
+     },
+     "DATE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 43,
+      "missed": 43,
+      "spurious": 0
+     },
+     "USERID": {
+      "precision": 0.018867924528301886,
+      "recall": 0.045454545454545456,
+      "f1": 0.02666666666666667,
+      "support": 22,
+      "missed": 21,
+      "spurious": 52
+     },
+     "ORG": {
+      "precision": 0.08290155440414508,
+      "recall": 0.14035087719298245,
+      "f1": 0.10423452768729641,
+      "support": 114,
+      "missed": 98,
+      "spurious": 177
+     },
+     "LOCATION": {
+      "precision": 0.4294294294294294,
+      "recall": 0.4965277777777778,
+      "f1": 0.4605475040257649,
+      "support": 288,
+      "missed": 145,
+      "spurious": 190
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6172839506172839,
+      "recall": 0.662621359223301,
+      "f1": 0.6391496734015405
+     },
+     "NORP": {
+      "precision": 0.68,
+      "recall": 0.32653061224489793,
+      "f1": 0.4412003244120032
+     },
+     "DATE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "USERID": {
+      "precision": 0.41509433962264153,
+      "recall": 1.0,
+      "f1": 0.5866666666666668
+     },
+     "ORG": {
+      "precision": 0.35233160621761656,
+      "recall": 0.4649122807017544,
+      "f1": 0.40086758244813964
+     },
+     "LOCATION": {
+      "precision": 0.6606606606606606,
+      "recall": 0.6840277777777778,
+      "f1": 0.6721411899721621
+     },
+     "all": {
+      "precision": 0.580267558528428,
+      "recall": 0.5905834186284544,
+      "f1": 0.5853800442940363
+     }
+    }
+   },
+   "model_plus_rules": {
+    "entity_micro": {
+     "precision": 0.2715842414082146,
+     "recall": 0.33162743091095187,
+     "f1": 0.2986175115207373,
+     "n_gold": 977,
+     "n_pred": 1193,
+     "n_correct": 324
+    },
+    "entity_macro_f1": 0.4581448581638335,
+    "entity_micro_f1_ci95": [
+     0.2683454557587081,
+     0.3302402710612532
+    ],
+    "per_type": {
+     "PERSON": {
+      "precision": 0.16163410301953818,
+      "recall": 0.220873786407767,
+      "f1": 0.18666666666666665,
+      "support": 412,
+      "missed": 321,
+      "spurious": 472
+     },
+     "NORP": {
+      "precision": 0.5714285714285714,
+      "recall": 0.2857142857142857,
+      "f1": 0.38095238095238093,
+      "support": 98,
+      "missed": 70,
+      "spurious": 21
+     },
+     "DATE": {
+      "precision": 0.6857142857142857,
+      "recall": 0.5581395348837209,
+      "f1": 0.6153846153846154,
+      "support": 43,
+      "missed": 19,
+      "spurious": 11
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 22,
+      "missed": 0,
+      "spurious": 0
+     },
+     "ORG": {
+      "precision": 0.08333333333333333,
+      "recall": 0.14035087719298245,
+      "f1": 0.10457516339869281,
+      "support": 114,
+      "missed": 98,
+      "spurious": 176
+     },
+     "LOCATION": {
+      "precision": 0.4307228915662651,
+      "recall": 0.4965277777777778,
+      "f1": 0.4612903225806452,
+      "support": 288,
+      "missed": 145,
+      "spurious": 189
+     }
+    },
+    "lenient": {
+     "PERSON": {
+      "precision": 0.6216696269982238,
+      "recall": 0.662621359223301,
+      "f1": 0.641492586413516
+     },
+     "NORP": {
+      "precision": 0.6938775510204082,
+      "recall": 0.32653061224489793,
+      "f1": 0.44408163265306116
+     },
+     "DATE": {
+      "precision": 0.9714285714285714,
+      "recall": 0.8372093023255814,
+      "f1": 0.899338721528288
+     },
+     "USERID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "ORG": {
+      "precision": 0.3541666666666667,
+      "recall": 0.4649122807017544,
+      "f1": 0.40205265506470333
+     },
+     "LOCATION": {
+      "precision": 0.6626506024096386,
+      "recall": 0.6840277777777778,
+      "f1": 0.6731695194308968
+     },
+     "all": {
+      "precision": 0.6102263202011735,
+      "recall": 0.6274309109518935,
+      "f1": 0.6187090356413749
+     }
+    }
+   }
+  }
+ },
+ "strategy": {
+  "chosen": "replace",
+  "validation_micro_f1": {
+   "add": [
+    0.40470588235294114,
+    0.45023696682464454,
+    0.47863247863247854,
+    0.37149719775820655,
+    0.38032786885245906,
+    0.3773584905660377,
+    0.3996948893974066,
+    0.40218238503507403,
+    0.4126482213438735,
+    0.4209737827715356,
+    0.4198645598194131,
+    0.4233463035019455,
+    0.4233463035019455,
+    0.3443708609271523
+   ],
+   "replace": [
+    0.40822784810126583,
+    0.45310015898251194,
+    0.4823805794831637,
+    0.3747980613893376,
+    0.3811881188118812,
+    0.37851239669421494,
+    0.4027671022290546,
+    0.40408805031446543,
+    0.4130262112787927,
+    0.4226415094339622,
+    0.4205748865355522,
+    0.4243369734789392,
+    0.4243369734789392,
+    0.3482142857142857
+   ]
+  },
+  "validation_runs": [
+   "pub_dp_eps1_seed42",
+   "pub_dp_eps3_seed42",
+   "pub_dp_eps8_seed42",
+   "pub_pe_dp_eps1_seed1234",
+   "pub_pe_dp_eps1_seed2024",
+   "pub_pe_dp_eps1_seed42",
+   "pub_pe_dp_eps3_seed1234",
+   "pub_pe_dp_eps3_seed2024",
+   "pub_pe_dp_eps3_seed42",
+   "pub_pe_dp_eps8_seed1234",
+   "pub_pe_dp_eps8_seed2024",
+   "pub_pe_dp_eps8_seed42",
+   "pub_pe_lrsweep_eps8_lr0.001",
+   "pub_pe_lrsweep_eps8_lr0.003"
+  ]
+ }
+}

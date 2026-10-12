@@ -608,6 +608,8 @@ def _run(cfg, splits, out, device, public=None):
     with open(os.path.join(rdir, "errors.json"), "w", encoding="utf-8") as f:
         json.dump(error_examples(splits["test"]["tokens"], results["test"]["gold"], results["test"]["pred"]),
                   f, ensure_ascii=False, indent=1)
+    with open(os.path.join(rdir, "predictions.json"), "w", encoding="utf-8") as f:   # input to hybrid_eval.py
+        json.dump({k: {"gold": results[k]["gold"], "pred": results[k]["pred"]} for k in ("validation", "test")}, f)
     with open(os.path.join(rdir, "metrics.json"), "w") as f:
         json.dump(metrics, f, indent=1)
     m = test_metrics

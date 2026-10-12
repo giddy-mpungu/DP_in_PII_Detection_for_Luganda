@@ -19,7 +19,13 @@ membership-inference test.
 | Warm start + non-private | ∞ | 0.767 ± 0.023 | 0.783 | 0.719 |
 | Warm start + DP-SGD | 8 | 0.373 ± 0.001 | 0.213 | 0.515 |
 | Warm start + DP-SGD | 3 | 0.341 ± 0.004 | 0.193 | 0.512 |
-| Warm start + DP-SGD | 1 | 0.307 (one seed) | 0.177 | 0.508 |
+| Warm start + DP-SGD | 1 | 0.300 ± 0.007 | 0.173 | 0.509 |
+| Warm start + DP-SGD, top 2 layers + head only | 8 | 0.321 ± 0.005 | 0.271 | 0.509 |
+| Warm start + DP-SGD, top 2 layers + head only | 3 | 0.305 ± 0.004 | 0.256 | 0.507 |
+| Warm start + DP-SGD, top 2 layers + head only | 1 | 0.273 ± 0.004 | 0.168 | 0.502 |
+| Released DP model + USERID/DATE rules (seed 42) | 8 | 0.423 | 0.478 | (as the model) |
+| Released DP model + USERID/DATE rules (seed 42) | 3 | 0.381 | 0.459 | (as the model) |
+| Released DP model + USERID/DATE rules (seed 42) | 1 | 0.351 | 0.442 | (as the model) |
 
 Main findings:
 * DP-SGD started from a raw multilingual backbone learns nothing at any budget; from a public warm start it
@@ -27,6 +33,12 @@ Main findings:
 * The loss of utility is uneven across categories: USERID (phone numbers, emails, IDs), NORP and DATE are lost
   entirely under DP, because the public data does not cover them.
 * DP reduces membership-inference success from AUC ≈ 0.70 to chance.
+* Rule-based recognisers for identifiers and dates (`experiments/hybrid_eval.py`), which use no training data and
+  so cost no privacy, restore USERID (F1 1.00 on this corpus, whose IDs are unusually regular) and raise DATE to 0.62.
+* Training only the top two layers under DP learns NORP (F1 0.57 at ε = 8) but weakens PERSON, so macro-F1 rises
+  and micro-F1 falls.
+* In `lg-ner`, an entity whose last word ends in a one-character unit has that unit labelled `O` (683 of 694 such
+  mentions), e.g. `202 ##2` is labelled as the date `202`; the rules follow this convention.
 
 ## Released models
 
@@ -43,12 +55,14 @@ scores: [luganda-pii-dp-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps
 | `experiments/run_experiments_colab.ipynb` | Runs every experiment on a Colab GPU (resumable; results saved to Google Drive) |
 | `experiments/annotation_agreement.py` | Inter-annotator agreement from the upstream multi-annotator files |
 | `experiments/analyze.py` | Builds every table, figure and number in the dissertation from `results/` |
+| `experiments/hybrid_eval.py` | Rule-based USERID and DATE recognisers, and DP model vs DP model + rules (rules and combination chosen on train/validation only) |
 | `experiments/make_model_card.py` | Writes the Hugging Face model card of a released private model from its results |
 | `results/` | `metrics.json` (configuration, environment, history, privacy accounting, all metrics) and `losses.json` for every run |
 | `original_notebooks/` | Notebooks of the earlier submitted version (kept for reference; see note below) |
 
-`errors.json` files (test-set errors with their sentences) are produced by the script but not published here,
-because they contain text from the lg-ner corpus.
+`errors.json` files (test-set errors with their sentences) and `predictions.json` files (gold and predicted tags,
+input to `hybrid_eval.py`) are produced by the scripts but not published here, because they contain text or
+annotations from the lg-ner corpus.
 
 ## Experiments
 
@@ -56,7 +70,7 @@ because they contain text from the lg-ner corpus.
 |---|---|
 | `main` | Non-private baseline (3 seeds); DP learning-rate sweep at ε = 8; DP at ε = 8, 3, 1. All start from `xlm-roberta-base`, which has never seen `lg-ner` labels. |
 | `public` | Non-private warm start on public Luganda NER data (MasakhaNER 2.0, with every sentence sharing an 8-gram with `lg-ner` removed), then non-private and DP fine-tuning on `lg-ner` |
-| `public_pe` | Optional: as `public`, but DP updates only the top two transformer layers and the classifier |
+| `public_pe` | As `public`, but DP updates only the top two transformer layers and the classifier (batch 128, 20 epochs) |
 | `leakage` | `Conrad747/luganda-ner-v6` evaluated as released (entity and token metrics, train-split F1, membership inference) |
 | `audit` | Dataset statistics, split overlap, truncation |
 

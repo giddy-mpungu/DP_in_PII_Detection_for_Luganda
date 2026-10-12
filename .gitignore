@@ -1,5 +1,10 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 .venv/
 results/*/model/
+results/*/release_model/
 smoke/
+# contain lg-ner text or annotations, which are not redistributed
+results/*/errors.json
+results/*/predictions.json
+results/*.log

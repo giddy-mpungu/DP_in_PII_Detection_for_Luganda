@@ -574,7 +574,106 @@ def main(res, tex):
               + "\n\\bottomrule\n\\end{tabular}\n\\end{table}\n")
         macros["RunGPU"] = (e.get("gpu") or "CPU").replace("_", " ")
 
+    # ---------------------------------------------------------------- parameter-efficient DP (Experiment D)
+    rows = []
+    for eps, tag in ((8, "EpsEight"), (3, "EpsThree"), (1, "EpsOne")):
+        full, pe = group(runs, f"pub_dp_eps{eps}"), group(runs, f"pub_pe_dp_eps{eps}")
+        if not pe:
+            continue
+        F = [f1(m) for m in pe]
+        macros[f"PubPe{tag}F"] = f"{np.mean(F):.3f}"
+        macros[f"PubPe{tag}FPM"] = (f"{np.mean(F):.3f}~$\\pm$~{np.std(F, ddof=1):.3f}" if len(F) > 1
+                                     else f"{np.mean(F):.3f} (one seed)")
+        macros[f"PubPe{tag}Macro"] = f"{np.mean([m['test']['entity_macro_f1'] for m in pe]):.3f}"
+        macros[f"PubPe{tag}MIA"] = f"{np.mean([m['mia_auc_train_vs_test'] for m in pe]):.3f}"
+        macros[f"PubPe{tag}Sigma"] = f"{pe[0]['privacy']['noise_multiplier']:.3f}"
+        for t in TYPES:
+            macros[f"PubPe{tag}{t.title()}F"] = f"{np.mean([m['test']['per_type'][t]['f1'] for m in pe]):.2f}"
+        for label, g in (("All layers above the embeddings", full), ("Top two layers + head", pe)):
+            if not g:
+                continue
+            rows.append(f"{eps} & {label} & {g[0]['trainable_params'] / 1e6:.1f}M & {g[0]['privacy']['noise_multiplier']:.3f} & "
+                        f"{ms([f1(m) for m in g])} & {ms([m['test']['entity_macro_f1'] for m in g])} & "
+                        f"{ms([m['mia_auc_train_vs_test'] for m in g])} \\\\")
+        rows.append("\\midrule")
+    if pe_runs := [m for n, m in runs.items() if n.startswith("pub_pe_lrsweep")]:
+        macros["PubPeLR"] = sci(json.load(open(os.path.join(res, "selected_lr_public_pe.json")))["lr"]) \
+            if os.path.exists(os.path.join(res, "selected_lr_public_pe.json")) else "??"
+        macros["PubPeNTrainable"] = f"{pe_runs[0]['trainable_params'] / 1e6:.1f} million"
+    if rows:
+        write(os.path.join(gen, "pe_results_table.tex"),
+              "\\begin{table}[ht]\n\\centering\n\\caption{DP fine-tuning from the public warm start with all layers above the "
+              "embeddings trained (Table~\\ref{tab:public_results}) and with only the top two transformer layers and the head "
+              "trained (Section~\\ref{sec:pe_design}). Test set, mean $\\pm$ s.d.\\ over three seeds.}\n\\label{tab:pe_results}\n"
+              "\\begin{FitTable}\n\\begin{tabular}{clccccc}\n\\toprule\n$\\varepsilon$ & Trained parameters & Count & $\\sigma$ & "
+              "Micro-F1 & Macro-F1 & MIA AUC \\\\\n\\midrule\n" + "\n".join(rows[:-1])
+              + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
+    for tag in ("EpsEight", "EpsThree", "EpsOne"):
+        for suf in ("F", "FPM", "Macro", "MIA", "Sigma") + tuple(f"{t.title()}F" for t in TYPES):
+            macros.setdefault(f"PubPe{tag}{suf}", "??")
+    macros.setdefault("PubPeLR", "??")
+    macros.setdefault("PubPeNTrainable", "??")
+
+    # ---------------------------------------------------------------- hybrid: DP model + rules (hybrid_eval.py)
+    hp = os.path.join(res, "hybrid", "hybrid.json")
+    if os.path.exists(hp):
+        hy = json.load(open(hp))
+        ro = hy["rules_only"]
+        for split, tag in (("train", "Train"), ("validation", "Val"), ("test", "Test")):
+            for t in ("USERID", "DATE"):
+                macros[f"Rules{tag}{t.title()}F"] = f"{ro[split][t]['f1']:.2f}"
+                macros[f"Rules{tag}{t.title()}P"] = f"{ro[split][t]['precision']:.2f}"
+                macros[f"Rules{tag}{t.title()}R"] = f"{ro[split][t]['recall']:.2f}"
+                macros[f"Rules{tag}{t.title()}Len"] = f"{ro[split][t]['lenient_f1']:.2f}"
+        macros["HybStrategy"] = hy["strategy"]["chosen"]
+        rows = []
+        for eps, tag in ((8, "EpsEight"), (3, "EpsThree"), (1, "EpsOne")):
+            r = hy["runs"].get(f"pub_dp_eps{eps}_seed42")
+            if not r:
+                continue
+            mo, mh = r["model_only"], r["model_plus_rules"]
+            macros[f"Hyb{tag}BaseF"] = f"{mo['entity_micro']['f1']:.3f}"
+            macros[f"Hyb{tag}F"] = f"{mh['entity_micro']['f1']:.3f}"
+            macros[f"Hyb{tag}CI"] = "[{:.3f}, {:.3f}]".format(*mh["entity_micro_f1_ci95"])
+            macros[f"Hyb{tag}Macro"] = f"{mh['entity_macro_f1']:.3f}"
+            macros[f"Hyb{tag}BaseMacro"] = f"{mo['entity_macro_f1']:.3f}"
+            macros[f"Hyb{tag}R"] = f"{mh['entity_micro']['recall']:.3f}"
+            macros[f"Hyb{tag}BaseR"] = f"{mo['entity_micro']['recall']:.3f}"
+            for t in ("USERID", "DATE"):
+                macros[f"Hyb{tag}{t.title()}F"] = f"{mh['per_type'][t]['f1']:.2f}"
+            rows.append(f"$\\varepsilon = {eps}$ & {mo['entity_micro']['f1']:.3f} & {mh['entity_micro']['f1']:.3f} & "
+                        f"{mo['entity_macro_f1']:.3f} & {mh['entity_macro_f1']:.3f} & "
+                        f"{mo['entity_micro']['recall']:.3f} & {mh['entity_micro']['recall']:.3f} & "
+                        f"{mo['per_type']['USERID']['f1']:.2f} $\\to$ {mh['per_type']['USERID']['f1']:.2f} & "
+                        f"{mo['per_type']['DATE']['f1']:.2f} $\\to$ {mh['per_type']['DATE']['f1']:.2f} \\\\")
+        other = [hy["runs"][f"pub_dp_eps1_seed{s}"] for s in (1234, 2024) if f"pub_dp_eps1_seed{s}" in hy["runs"]]
+        if other:
+            macros["HybEpsOneOtherSeeds"] = " and ".join(
+                f"{r['model_only']['entity_micro']['f1']:.3f} to {r['model_plus_rules']['entity_micro']['f1']:.3f}"
+                for r in other)
+        if rows:
+            write(os.path.join(gen, "hybrid_table.tex"),
+                  "\\begin{table}[ht]\n\\centering\n\\caption{Test-set results of the released private models (warm start, "
+                  "seed 42) alone and combined with the rule-based USERID and DATE recognisers (Section~\\ref{sec:hybrid_method}). "
+                  "The rules use no training data, so the privacy guarantee is unchanged.}\n\\label{tab:hybrid}\n"
+                  "\\begin{FitTable}\n\\begin{tabular}{lcccccccc}\n\\toprule\n"
+                  " & \\multicolumn{2}{c}{Micro-F1} & \\multicolumn{2}{c}{Macro-F1} & \\multicolumn{2}{c}{Recall} & "
+                  "USERID F1 & DATE F1 \\\\\n\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}\\cmidrule(lr){6-7}\n"
+                  "Privacy level & DP & DP+rules & DP & DP+rules & DP & DP+rules & DP $\\to$ DP+rules & DP $\\to$ DP+rules \\\\\n"
+                  "\\midrule\n" + "\n".join(rows)
+                  + f"\n\\midrule\nRules alone & -- & -- & -- & -- & -- & -- & {macros['RulesTestUseridF']} & "
+                  f"{macros['RulesTestDateF']} \\\\\n\\bottomrule\n\\end{{tabular}}\n\\end{{FitTable}}\n\\end{{table}}\n")
+
     # every macro the chapters use exists even before all runs finish; missing ones show as "??"
+    for tag in ("EpsEight", "EpsThree", "EpsOne"):
+        for suf in ("BaseF", "F", "CI", "Macro", "BaseMacro", "R", "BaseR", "UseridF", "DateF"):
+            macros.setdefault(f"Hyb{tag}{suf}", "??")
+    for tag in ("Train", "Val", "Test"):
+        for t in ("Userid", "Date"):
+            for suf in ("F", "P", "R", "Len"):
+                macros.setdefault(f"Rules{tag}{t}{suf}", "??")
+    macros.setdefault("HybStrategy", "??")
+    macros.setdefault("HybEpsOneOtherSeeds", "??")
     stems = {"Base": "", "EpsEight": "", "EpsThree": "", "EpsOne": "", "PubBase": "", "PubEpsEight": "",
              "PubEpsThree": "", "PubEpsOne": ""}
     for s in stems:
