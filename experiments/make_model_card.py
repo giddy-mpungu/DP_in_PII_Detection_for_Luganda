@@ -12,6 +12,16 @@ TYPES = ["PERSON", "NORP", "DATE", "USERID", "ORG", "LOCATION"]
 def main(run_dir, repo_id):
     m = json.load(open(os.path.join(run_dir, "metrics.json")))
     t, p, c = m["test"], m["privacy"], m["config"]
+    prv = p.get("accountant", "").startswith("PRV")      # Experiment E: noise calibrated with the PRV accountant
+    eps_cert = p["epsilon_prv"] if prv else p["epsilon_rdp"]
+    synth = "synth" in c["init"]
+    acct_row = (f"PRV (ε = {p['epsilon_prv']:.2f}, used to calibrate the noise); RDP gives a looser ε = {p['epsilon_rdp']:.2f}"
+                if prv else f"RDP (ε = {p['epsilon_rdp']:.2f}); PRV cross-check ε = {p.get('epsilon_prv', float('nan')):.2f}")
+    warm = ("`xlm-roberta-base` fine-tuned on the Luganda part of MasakhaNER 2.0 (every sentence sharing an 8-word "
+            "sequence with any `lg-ner` sentence removed) plus 3,000 synthetic Luganda PII sentences generated from "
+            "public name, place, organisation and identifier lists (`experiments/synthetic_data.py`)" if synth else
+            "`xlm-roberta-base` fine-tuned on the Luganda part of MasakhaNER 2.0, with every sentence that shares an "
+            "8-word sequence with any `lg-ner` sentence removed")
     rows = "\n".join(f"| {k} | {t['per_type'][k]['support']} | {t['per_type'][k]['precision']:.3f} | "
                      f"{t['per_type'][k]['recall']:.3f} | {t['per_type'][k]['f1']:.3f} |" for k in TYPES)
     card = f"""---
@@ -32,7 +42,7 @@ tags:
 - opacus
 ---
 
-# Luganda PII detector trained with differential privacy (ε = {c['target_epsilon']:g})
+# Luganda PII detector trained with differential privacy (ε = {c['target_epsilon']:g}){" — v2" if synth else ""}
 
 Token-classification model that detects personally identifiable information (PII) in Luganda text:
 PERSON, USERID (telephone numbers, email addresses, account and ID numbers), LOCATION, DATE, ORG and NORP,
@@ -44,7 +54,7 @@ https://github.com/giddy-mpungu/DP_in_PII_Detection_for_Luganda
 
 ## Privacy guarantee
 
-This model satisfies **(ε, δ) = ({p['epsilon_rdp']:.2f}, {p['delta']:g})-differential privacy with respect to
+This model satisfies **(ε, δ) = ({eps_cert:.2f}, {p['delta']:g})-differential privacy with respect to
 each individual sentence of the `lg-ner` training split** (2,085 sentences).
 
 | | |
@@ -54,11 +64,10 @@ each individual sentence of the `lg-ner` training split** (2,085 sentences).
 | Clipping norm C | {p['max_grad_norm']} |
 | Sampling | Poisson, rate q = {p['sample_rate']:.4f} (expected batch {c['batch_size']}) |
 | Steps | {p['optimizer_steps']} ({c['epochs']} epochs) |
-| Accountant | RDP (ε = {p['epsilon_rdp']:.2f}); PRV cross-check ε = {p.get('epsilon_prv', float('nan')):.2f} |
+| Accountant | {acct_row} |
 
-Before private fine-tuning, the model was trained **non-privately on public data only**: `xlm-roberta-base`
-fine-tuned on the Luganda part of MasakhaNER 2.0, with every sentence that shares an 8-word sequence with any
-`lg-ner` sentence removed. The guarantee therefore covers the `lg-ner` sentences in full.
+Before private fine-tuning, the model was trained **non-privately on public data only**: {warm}.
+The guarantee therefore covers the `lg-ner` sentences in full.
 
 Limits of the guarantee: it is per sentence, not per person (a person appearing in k sentences is protected at
 roughly kε); the learning rate was selected on the validation split without accounting for that selection; and
@@ -74,7 +83,11 @@ Membership-inference (loss-threshold) AUC on train vs. test sentences: {m['mia_a
 |---|---|---|---|---|
 {rows}
 
-Results for all privacy levels, three seeds each, are in the dissertation and the code repository.
+Results for all privacy levels and seeds are in the dissertation and the code repository. The USERID values in
+`lg-ner` are synthetic (generated in three fixed formats), so the USERID scores above measure those formats, not
+identifiers as they occur in real text.
+
+Try it in your browser (nothing you type is uploaded): https://huggingface.co/spaces/e4gl33y3/luganda-pii-dp
 
 ## Intended use
 

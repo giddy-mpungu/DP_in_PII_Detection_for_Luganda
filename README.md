@@ -4,9 +4,11 @@ Code and results for the MSc dissertation *Differentially Private Model for PII 
 Languages* (Gideon Mpungu, Makerere University, 2026).
 
 The study fine-tunes an XLM-RoBERTa-base token classifier to detect personally identifiable information (PII)
-in Luganda text, without privacy and with DP-SGD (Opacus) at ε = 8, 3 and 1 (δ = 10⁻⁵). It evaluates utility
-at entity level and per PII category, alongside the formal privacy guarantee and an empirical
-membership-inference test.
+in Luganda text, without privacy and with DP-SGD (Opacus) at ε = 8, 3, 1 and 0.5 (δ = 10⁻⁵). It evaluates utility
+at entity level and per PII category, alongside the formal privacy guarantee, a membership-inference test and a
+canary audit.
+
+**Try it in your browser** (nothing you type is uploaded): https://huggingface.co/spaces/e4gl33y3/luganda-pii-dp
 
 ## Results (lg-ner test split, entity level)
 
@@ -26,6 +28,12 @@ membership-inference test.
 | Released DP model + USERID/DATE rules (seed 42) | 8 | 0.423 | 0.478 | (as the model) |
 | Released DP model + USERID/DATE rules (seed 42) | 3 | 0.381 | 0.459 | (as the model) |
 | Released DP model + USERID/DATE rules (seed 42) | 1 | 0.351 | 0.442 | (as the model) |
+| Public + synthetic warm start only (no lg-ner training) | – | 0.245 | 0.210 | 0.521 |
+| **v2**: synthetic warm start + DP-SGD (batch 256, 25 epochs, PRV-calibrated noise) | 8 | 0.485 ± 0.006 | 0.488 | 0.532 |
+| **v2** | 3 | 0.419 | 0.401 | 0.526 |
+| **v2** | 1 | 0.344 ± 0.019 | 0.327 | 0.519 |
+| **v2** | 0.5 | 0.336 | 0.328 | 0.515 |
+| v2 + USERID/DATE rules (seed 42) | 8 / 0.5 | 0.508 / 0.357 | | (as the model) |
 
 Main findings:
 * DP-SGD started from a raw multilingual backbone learns nothing at any budget; from a public warm start it
@@ -38,7 +46,16 @@ Main findings:
 * Training only the top two layers under DP learns NORP (F1 0.57 at ε = 8) but weakens PERSON, so macro-F1 rises
   and micro-F1 falls.
 * In `lg-ner`, an entity whose last word ends in a one-character unit has that unit labelled `O` (683 of 694 such
-  mentions), e.g. `202 ##2` is labelled as the date `202`; the rules follow this convention.
+  mentions), e.g. `202 ##2` is labelled as the date `202`; the rules follow this convention. The cause is an
+  inclusive end offset of the annotation tool read as exclusive during conversion. The corpus's USERID values are
+  synthetic (three fixed formats), so USERID scores measure those formats.
+* **v2** (`--plan improve`): adding 3,000 synthetic public PII sentences to the warm start (`experiments/synthetic_data.py`,
+  no private data, no privacy cost) and training with larger batches and PRV-calibrated noise raises the private
+  models to 0.485 at ε = 8 and 0.336 at ε = 0.5, which is better than the earlier model at ε = 1. USERID, NORP and
+  DATE are detected again at ε = 8.
+* **Canary audit** (`experiments/canary_audit.py`, Steinke et al. 2023): against a non-private model the auditor is
+  right 499 times out of 500 (ε ≥ 4.31 at 95% confidence); against the v2 model at ε = 8, 251 of 500 (no leakage
+  detected).
 
 ## Released models
 
@@ -46,6 +63,11 @@ Private models trained from the public warm start, each with a model card statin
 scores: [luganda-pii-dp-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps8) ·
 [luganda-pii-dp-eps3](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps3) ·
 [luganda-pii-dp-eps1](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps1).
+
+v2 models (Experiment E): [luganda-pii-dp-v2-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps8) ·
+[v2-eps3](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps3) ·
+[v2-eps1](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps1) ·
+[v2-eps0.5](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps0.5). The browser demo uses these.
 
 ## Contents
 
@@ -56,6 +78,10 @@ scores: [luganda-pii-dp-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps
 | `experiments/annotation_agreement.py` | Inter-annotator agreement from the upstream multi-annotator files |
 | `experiments/analyze.py` | Builds every table, figure and number in the dissertation from `results/` |
 | `experiments/hybrid_eval.py` | Rule-based USERID and DATE recognisers, and DP model vs DP model + rules (rules and combination chosen on train/validation only) |
+| `experiments/synthetic_data.py` | Synthetic public Luganda PII sentences for the v2 warm start |
+| `experiments/canary_audit.py` | Empirical lower bound on ε from one training run (canaries included with probability 1/2) |
+| `experiments/v6_metric.py` | Scores a model with the sub-token metric of `luganda-ner-v6`, next to word-level F1 |
+| `demo/` | In-browser demo (transformers.js): ONNX export, Opacus RDP accountant port (`site/rdp.js`), rules (`site/rules.js`) |
 | `experiments/make_model_card.py` | Writes the Hugging Face model card of a released private model from its results |
 | `results/` | `metrics.json` (configuration, environment, history, privacy accounting, all metrics) and `losses.json` for every run |
 | `original_notebooks/` | Notebooks of the earlier submitted version (kept for reference; see note below) |
@@ -71,6 +97,7 @@ annotations from the lg-ner corpus.
 | `main` | Non-private baseline (3 seeds); DP learning-rate sweep at ε = 8; DP at ε = 8, 3, 1. All start from `xlm-roberta-base`, which has never seen `lg-ner` labels. |
 | `public` | Non-private warm start on public Luganda NER data (MasakhaNER 2.0, with every sentence sharing an 8-gram with `lg-ner` removed), then non-private and DP fine-tuning on `lg-ner` |
 | `public_pe` | As `public`, but DP updates only the top two transformer layers and the classifier (batch 128, 20 epochs) |
+| `improve` | v2: public + synthetic warm start; DP-SGD with batch 256, 25 epochs, PRV-calibrated noise at ε = 8, 3, 1, 0.5; canary audit |
 | `leakage` | `Conrad747/luganda-ner-v6` evaluated as released (entity and token metrics, train-split F1, membership inference) |
 | `audit` | Dataset statistics, split overlap, truncation |
 

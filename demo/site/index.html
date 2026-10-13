@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luganda PII Detector</title>
+<meta name="description" content="Detect personal information in Luganda text with models trained under differential privacy. Runs entirely in your browser.">
+<style>
+:root {
+  --bg: #f7f6f2; --surface: #ffffff; --ink: #14213d; --text: #3d4656; --muted: #6b6f78; --line: #e1e0d9;
+  --accent: #2a78d6; --accent-ink: #ffffff; --warn-bg: #fff4e5; --warn-line: #f0c27b;
+  --PERSON: #cfe3fb; --NORP: #e7dcfb; --DATE: #fde6c8; --USERID: #fbd0d0; --ORG: #d4f1e4; --LOCATION: #f3efc2;
+  --mem: #eb6834; --nonmem: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --surface: #1b2029; --ink: #eef1f6; --text: #c9d0dc; --muted: #929aa8; --line: #2c3340;
+    --accent: #6aa8f0; --accent-ink: #0d1117; --warn-bg: #2b2416; --warn-line: #7a5b25;
+    --PERSON: #20406a; --NORP: #3d2f63; --DATE: #5a4120; --USERID: #5e2a2a; --ORG: #1f4a3a; --LOCATION: #4d4a1f;
+    --mem: #f08a5d; --nonmem: #6aa8f0;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --surface: #1b2029; --ink: #eef1f6; --text: #c9d0dc; --muted: #929aa8; --line: #2c3340;
+  --accent: #6aa8f0; --accent-ink: #0d1117; --warn-bg: #2b2416; --warn-line: #7a5b25;
+  --PERSON: #20406a; --NORP: #3d2f63; --DATE: #5a4120; --USERID: #5e2a2a; --ORG: #1f4a3a; --LOCATION: #4d4a1f;
+  --mem: #f08a5d; --nonmem: #6aa8f0;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+h1, h2, h3 { color: var(--ink); line-height: 1.2; }
+h1 { font-size: clamp(28px, 5vw, 40px); margin: 0 0 8px; }
+h2 { font-size: 24px; margin: 48px 0 8px; }
+h3 { font-size: 17px; margin: 0 0 6px; }
+p { margin: 0 0 12px; }
+a { color: var(--accent); }
+.lede { font-size: 18px; max-width: 760px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.warn { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+textarea { width: 100%; min-height: 120px; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; resize: vertical; }
+button { font: inherit; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button:disabled { opacity: .6; cursor: wait; }
+.seg { display: inline-flex; gap: 4px; }
+.examples button { font-size: 14px; }
+#status { color: var(--muted); font-size: 14px; min-height: 22px; margin-top: 8px; }
+#status[data-busy="1"]::before { content: "⏳ "; }
+#output { font-size: 18px; line-height: 2.2; white-space: pre-wrap; word-break: break-word; }
+mark { color: var(--ink); border-radius: 4px; padding: 2px 4px; }
+mark .tag { font-size: 10px; font-weight: 700; letter-spacing: .03em; margin-left: 4px; color: var(--muted); vertical-align: 2px; }
+.t-PERSON { background: var(--PERSON); } .t-NORP { background: var(--NORP); } .t-DATE { background: var(--DATE); }
+.t-USERID { background: var(--USERID); } .t-ORG { background: var(--ORG); } .t-LOCATION { background: var(--LOCATION); }
+#found { padding-left: 20px; margin: 8px 0 0; }
+#redacted { font-family: ui-monospace, Consolas, monospace; font-size: 14px; background: var(--bg); border-radius: 8px; padding: 10px; white-space: pre-wrap; word-break: break-word; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.big { font-size: 44px; font-weight: 700; color: var(--ink); line-height: 1; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
+tbody th { font-weight: 500; color: var(--ink); }
+.table-wrap { overflow-x: auto; }
+label.f { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); gap: 4px; }
+label.f input { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; width: 140px; }
+figure { margin: 0; }
+figcaption { font-size: 14px; margin-bottom: 4px; }
+svg { width: 100%; height: auto; }
+svg .axis { stroke: var(--line); } svg .lbl { fill: var(--muted); font-size: 10px; }
+svg .mem { fill: none; stroke: var(--mem); stroke-width: 2; } svg .nonmem { fill: none; stroke: var(--nonmem); stroke-width: 2; stroke-dasharray: 4 3; }
+.key { font-size: 13px; color: var(--muted); }
+.key i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--mem); vertical-align: middle; margin-right: 4px; }
+.key i.n { border-top: 2px dashed var(--nonmem); }
+ul.plain { padding-left: 20px; }
+footer { margin-top: 48px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<h1>Luganda PII detector, trained with differential privacy</h1>
+<p class="lede">Type or paste Luganda text and see which words look like personal information. The detector is one of the
+models from an MSc study of differentially private (DP) PII detection. Everything runs in your browser: your text is
+never uploaded.</p>
+<div class="warn"><b>A research demo, not a redaction tool.</b> Even the least private of these models misses about half
+of the PII mentions in held-out test text, and stronger privacy misses more (see <a href="#accuracy">how good is it</a>). They were trained on lower-case Luganda
+news sentences, so other kinds of text will do worse. Always review the output yourself.</div>
+
+<section class="card" aria-labelledby="try">
+  <h2 id="try" style="margin-top:0">Try it</h2>
+  <textarea id="input" aria-label="Luganda text to check">Musoke Peter abeera e Ntinda mu Kampala. Essimu ye 0772 123456, era email ye musoke.peter@example.com.</textarea>
+  <div class="row examples" style="margin:8px 0 12px">
+    <span class="key">Examples (invented):</span>
+    <button data-example="Ku lwokubiri nga 14 janwali 2025, ababaka ba NRM baasisinkana ku Palamenti e Kampala.">Meeting</button>
+    <button data-example="Nnamba ya ndagamuntu ya Nakato Sarah ye cm12345678abcd, era emmotoka ye UBK 904Q.">ID and plate</button>
+    <button data-example="Omukulembeze wa Uganda Yoweri Museveni yasisinkanye abakulu ba KCCA e Entebbe.">Officials</button>
+  </div>
+  <div class="row">
+    <span>Privacy level:</span>
+    <span class="seg" role="group" aria-label="Privacy level">
+      <button data-eps="8" aria-pressed="true">ε = 8</button>
+      <button data-eps="3" aria-pressed="false">ε = 3</button>
+      <button data-eps="1" aria-pressed="false">ε = 1</button>
+      <button data-eps="0.5" aria-pressed="false">ε = 0.5 (strongest)</button>
+    </span>
+    <label><input type="checkbox" id="rules" checked> add rules for IDs and dates</label>
+    <button id="run" class="primary">Find PII</button>
+  </div>
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="result" hidden>
+    <div id="output" style="margin-top:12px"></div>
+    <h3 style="margin-top:16px">Found</h3>
+    <ul id="found"></ul>
+    <h3 style="margin-top:16px">Masked</h3>
+    <div id="redacted"></div>
+  </div>
+</section>
+
+<h2 id="proof">Why the model is private</h2>
+<p>Differential privacy is a property of <i>how a model was trained</i>, so it cannot be shown by looking at one prediction.
+What can be shown is the training recipe and its accounting, which anyone can check, plus an attack that fails.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3>Privacy certificate: ε = <span id="cert-eps"></span></h3>
+    <p class="key">Model <a id="cert-repo" href="#"></a>, trained with DP-SGD (Opacus) from a warm start on public and synthetic data only. Guarantee: adding or removing any one
+    training sentence changes the probability of any outcome of training by at most a factor e<sup>ε</sup>, except with probability δ.
+    ε is certified by the PRV accountant, which was used to calibrate the noise; the older RDP accountant gives a looser bound of ε = <span id="cert-rdp"></span> for the same training.</p>
+    <div class="table-wrap"><table><tbody id="cert-table"></tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>Check the arithmetic yourself</h3>
+    <p class="key">ε follows from four numbers alone. This calculator is a line-by-line port of the Opacus RDP accountant; it
+    reproduces the RDP ε that Opacus recorded for every DP training run in the study to within 10<sup>−7</sup>. RDP is a looser,
+    still valid bound than the certified PRV value. Change σ or T to see how the guarantee moves.</p>
+    <div class="row" style="gap:10px;margin:10px 0">
+      <label class="f">noise σ<input id="calc-sigma" inputmode="decimal"></label>
+      <label class="f">sampling rate q<input id="calc-q" inputmode="decimal"></label>
+      <label class="f">steps T<input id="calc-steps" inputmode="numeric"></label>
+      <label class="f">δ<input id="calc-delta" inputmode="decimal"></label>
+    </div>
+    <p>ε (RDP) = <span class="big" id="calc-out">–</span></p>
+    <p class="key" id="calc-note"></p>
+    <button id="calc-reset">Reset to this model</button>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>An attack that fails: membership inference</h3>
+  <p>An attacker tries to tell whether a sentence was in the training data from the model's loss on it. If training
+  sentences (solid) have lower loss than unseen ones (dashed), the model has memorised them. AUC 0.5 means the attacker
+  does no better than a coin flip.</p>
+  <p class="key"><i></i>training sentences (members) &nbsp; <i class="n"></i>unseen test sentences</p>
+  <div class="grid3">
+    <figure id="mia-np"></figure><figure id="mia-dp8"></figure><figure id="mia-dp1"></figure>
+  </div>
+  <p class="key" style="margin-top:8px">This attack is weak, so it gives a lower bound on leakage, not proof of its absence. The proof is the
+  certificate above; the attack shows the effect is real.</p>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>What DP protects, and what it does not</h3>
+  <ul class="plain">
+    <li><b>Protected:</b> the people in the 2,085 training sentences. Nothing the model does reveals much about any one of them.</li>
+    <li><b>Not covered by DP:</b> the text you type here. It is protected differently: the model runs in your browser and nothing is sent anywhere.</li>
+    <li><b>Not covered either:</b> PII the detector misses in your text. That is a question of accuracy, below.</li>
+    <li>The guarantee is per sentence: a person who appears in k training sentences is protected at roughly kε.</li>
+  </ul>
+</div>
+
+<h2 id="accuracy">How good is it?</h2>
+<p>Scores on 536 held-out test sentences (entity level, exact match). Privacy has a large cost in accuracy, and the
+rules recover part of it at no privacy cost.</p>
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Model</th><th>ε</th><th>F1</th><th>Finds</th><th>With rules: F1 / finds</th><th>Attack AUC</th></tr></thead>
+    <tbody id="acc-table"></tbody>
+  </table>
+  <p class="key" style="margin-top:8px">The browser copy of the ε-model is compressed to 8-bit weights; its test F1 is
+  <span id="browser-f1"></span> against <span id="full-f1"></span> for the full-precision model. The rules here are adapted to typed text
+  from the evaluated version (they also accept spaced phone numbers and emails).</p>
+</div>
+<div class="card table-wrap" style="margin-top:16px">
+  <h3>Share of each kind of PII found (ε = <span id="type-eps"></span>)</h3>
+  <table>
+    <thead><tr><th>Category</th><th>Non-private</th><th>DP model</th><th>DP model + rules</th></tr></thead>
+    <tbody id="type-table"></tbody>
+  </table>
+  <p class="key" style="margin-top:8px">The test set has only 22 ID and 43 date mentions, and its IDs are unusually uniform, so
+  the rule scores for those categories overstate what to expect on real text.</p>
+</div>
+
+<footer>
+  From the MSc dissertation <i>Differentially Private Model for PII Detection in Low-Resource Languages</i>, Gideon Mpungu,
+  Makerere University, 2026. Code and results:
+  <a href="https://github.com/giddy-mpungu/DP_in_PII_Detection_for_Luganda">github.com/giddy-mpungu/DP_in_PII_Detection_for_Luganda</a>.
+  Training data: <code>lg-ner</code> (Conrad747).
+</footer>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

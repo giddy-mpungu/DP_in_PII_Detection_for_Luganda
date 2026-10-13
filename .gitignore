@@ -8,3 +8,4 @@ smoke/
 results/*/errors.json
 results/*/predictions.json
 results/*.log
+demo/site/models/

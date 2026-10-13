@@ -57,6 +57,7 @@ MAX_LEN = 128
 MAIN_LRS = (2e-4, 5e-4, 1e-3)
 PUB_LRS = (5e-5, 2e-4, 5e-4)
 PE_LRS = (1e-3, 3e-3)
+BIG_LRS = (5e-4, 1e-3)
 
 
 def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
@@ -96,6 +97,41 @@ def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
                 for s in seeds:
                     runs.append(dict(pe, name=f"pub_pe_dp_eps{eps:g}_seed{s}", target_epsilon=eps, lr=pub_lr,
                                      seed=s, release=(s == 42)))
+    if plan == "improve":
+        # Experiment E: (1) a warm start on public + synthetic PII data (no privacy cost), (2) DP-SGD with a larger
+        # batch, more epochs and noise calibrated by the tighter PRV accountant, (3) a canary audit.
+        warm = os.path.join(out, "synth_warmstart", "model")
+        runs.append(dict(name="synth_warmstart", init=CLEAN_BACKBONE, mode="nonprivate", train_data="public_synth",
+                         lr=5e-5, batch_size=16, physical_batch=16, epochs=5, freeze_embeddings=True, seed=42,
+                         save_model=True))
+        # same DP configuration as Experiment C: isolates the effect of the synthetic data
+        for eps in (8.0, 1.0):
+            runs.append(dict(name=f"syn_dp_eps{eps:g}_seed42", init=warm, mode="dp", target_epsilon=eps,
+                             max_grad_norm=1.0, lr=2e-4, batch_size=64, physical_batch=16, epochs=15,
+                             freeze_embeddings=True, seed=42))
+        big = dict(init=warm, mode="dp", max_grad_norm=1.0, batch_size=256, physical_batch=16, epochs=25,
+                   freeze_embeddings=True, accountant="prv")
+        # learning rate chosen at the strictest main budget, where tuning matters most
+        for lr in BIG_LRS:
+            runs.append(dict(big, name=f"big_lrsweep_eps1_lr{lr:g}", target_epsilon=1.0, lr=lr, seed=42, sweep=True,
+                             release=True))
+        if dp_lr is not None:
+            for eps in (8.0, 3.0, 1.0, 0.5):
+                runs.append(dict(big, name=f"big_dp_eps{eps:g}_seed42", target_epsilon=eps, lr=dp_lr, seed=42,
+                                 release=True))
+            # privacy audit: the improved configuration at eps = 8, and a non-private model as a calibration point
+            runs.append(dict(big, name="canary_dp_eps8_seed42", target_epsilon=8.0, lr=dp_lr, seed=42, canaries=1000))
+            runs.append(dict(name="canary_nonprivate_seed42", init=warm, mode="nonprivate", lr=5e-5, batch_size=16,
+                             physical_batch=16, epochs=10, freeze_embeddings=True, seed=42, canaries=1000))
+            # the audit repeated with random-label canaries (the template canaries had no power, see make_canaries)
+            runs.append(dict(name="canary2_nonprivate_seed42", init=warm, mode="nonprivate", lr=5e-5, batch_size=16,
+                             physical_batch=16, epochs=10, freeze_embeddings=True, seed=42, canaries=1000,
+                             canary_kind="random"))
+            runs.append(dict(big, name="canary2_dp_eps8_seed42", target_epsilon=8.0, lr=dp_lr, seed=42, canaries=1000,
+                             canary_kind="random"))
+            for eps in (8.0, 1.0):
+                for sd in (1234, 2024):
+                    runs.append(dict(big, name=f"big_dp_eps{eps:g}_seed{sd}", target_epsilon=eps, lr=dp_lr, seed=sd))
     if plan in ("leakage", "repro", "all"):
         # The model used in the submitted thesis, evaluated without any further training.
         runs.append(dict(name="v6_no_further_training", init=V6_MODEL, mode="eval_only", seed=42))
@@ -130,11 +166,11 @@ def plan_runs(plan, dp_lr=None, out="results", pub_lr=None):
     return runs
 
 
-def select_dp_lr(out, prefix="lrsweep", lrs=MAIN_LRS):
+def select_dp_lr(out, prefix="lrsweep", lrs=MAIN_LRS, eps_tag="eps8"):
     """Best learning rate from the sweep by validation entity-F1 (final epoch)."""
     best = None
     for lr in lrs:
-        p = os.path.join(out, f"{prefix}_eps8_lr{lr:g}", "metrics.json")
+        p = os.path.join(out, f"{prefix}_{eps_tag}_lr{lr:g}", "metrics.json")
         if os.path.exists(p):
             with open(p) as f:
                 m = json.load(f)
@@ -217,6 +253,48 @@ def load_public(private_splits, report_path=None):
             json.dump(rep, f, indent=1)
     print("public data:", rep)
     return out
+
+
+def concat_datasets(parts):
+    from datasets import Dataset as HFDataset
+    return HFDataset.from_dict({"tokens": [list(t) for p in parts for t in p["tokens"]],
+                                "ner_tags": [list(t) for p in parts for t in p["ner_tags"]]})
+
+
+def synthetic_split(n, seed=0):
+    """Public synthetic Luganda PII sentences (synthetic_data.py); no lg-ner sentence is used."""
+    from datasets import Dataset as HFDataset
+    from synthetic_data import generate
+    rows = generate(n, seed)
+    return HFDataset.from_dict({"tokens": [t for t, _ in rows], "ner_tags": [[LABEL2ID[x] for x in g] for _, g in rows]})
+
+
+def make_canaries(n, seed, kind="template"):
+    """n canary sentences, each included in training independently with probability 1/2, decided by `seed`.
+    kind="template": synthetic_data frames holding a fresh phone number or ID. These turned out to be useless for
+    auditing: the warm start already fits such sentences, members or not.
+    kind="random": 8 random letter strings, one random 1-2 word span labelled with a random entity type. The label
+    cannot be predicted from anything but the sentence itself, so only memorisation lowers its loss."""
+    from datasets import Dataset as HFDataset
+    from synthetic_data import bilou, sentence
+    rng = random.Random(10_000 + seed)
+    rows = []
+    while len(rows) < n:
+        if kind == "random":
+            toks = ["".join(rng.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(rng.randint(3, 8))) for _ in range(8)]
+            L = rng.randint(1, 2)
+            s0 = rng.randrange(len(toks) - L + 1)
+            tags = ["O"] * len(toks)
+            tags[s0:s0 + L] = bilou(L, rng.choice(ENTITY_TYPES))
+            rows.append((toks, tags))
+            continue
+        toks, tags = sentence(rng)
+        if any(t.endswith("USERID") for t in tags):
+            rows.append((toks, tags))
+    included = [rng.random() < 0.5 for _ in rows]
+    split = lambda rs: HFDataset.from_dict({"tokens": [t for t, _ in rs], "ner_tags": [[LABEL2ID[x] for x in g] for _, g in rs]})
+    return {"all_split": split(rows), "included_split": split([r for r, i in zip(rows, included) if i]),
+            "included": included}
 
 
 class TokenDataset(Dataset):
@@ -484,7 +562,17 @@ def _run(cfg, splits, out, device, public=None):
     data = {k: TokenDataset(v, tok) for k, v in splits.items()}
     # training data: lg-ner (private) by default; MasakhaNER Luganda (public) for the warm-start model.
     # Validation curves, test metrics and the membership-inference test always use lg-ner.
-    train_ds = TokenDataset(public["train"], tok) if cfg.get("train_data") == "public" else data["train"]
+    canaries = None
+    if cfg.get("train_data") == "public":
+        train_ds = TokenDataset(public["train"], tok)
+    elif cfg.get("train_data") == "public_synth":
+        train_ds = TokenDataset(concat_datasets([public["train"], synthetic_split(cfg.get("synthetic_n", 3000))]), tok)
+    elif cfg.get("canaries"):
+        # privacy audit (Steinke et al., 2023): each canary is included in training with probability 1/2
+        canaries = make_canaries(cfg["canaries"], cfg["seed"], cfg.get("canary_kind", "template"))
+        train_ds = TokenDataset(concat_datasets([splits["train"], canaries["included_split"]]), tok)
+    else:
+        train_ds = data["train"]
     collate = make_collate(tok.pad_token_id)
     eval_loader = lambda k: DataLoader(data[k], batch_size=32, shuffle=False, collate_fn=collate)
     model = AutoModelForTokenClassification.from_pretrained(
@@ -510,7 +598,7 @@ def _run(cfg, splits, out, device, public=None):
         engine = None
         if cfg["mode"] == "dp":
             from opacus import PrivacyEngine
-            engine = PrivacyEngine(accountant="rdp")
+            engine = PrivacyEngine(accountant=cfg.get("accountant", "rdp"))
             model.train()  # from_pretrained returns eval mode; Opacus validates train mode
             common = dict(module=model, optimizer=optimizer, data_loader=train_loader,
                           max_grad_norm=cfg["max_grad_norm"], poisson_sampling=True)
@@ -521,7 +609,8 @@ def _run(cfg, splits, out, device, public=None):
                 model, optimizer, train_loader = engine.make_private(
                     noise_multiplier=cfg["noise_multiplier"], **common)
             privacy.update(noise_multiplier=optimizer.noise_multiplier, max_grad_norm=cfg["max_grad_norm"],
-                           sample_rate=1 / len(train_loader), delta=DELTA, accountant="RDP (Opacus)")
+                           sample_rate=1 / len(train_loader), delta=DELTA,
+                           accountant="PRV (Opacus)" if cfg.get("accountant") == "prv" else "RDP (Opacus)")
 
         for epoch in range(1, cfg["epochs"] + 1):
             model.train()
@@ -559,9 +648,11 @@ def _run(cfg, splits, out, device, public=None):
             print({k: round(v, 4) if isinstance(v, float) else v for k, v in h.items()}, flush=True)
 
         if engine is not None:
-            from opacus.accountants import PRVAccountant
-            privacy["epsilon_rdp"] = engine.get_epsilon(DELTA)
+            from opacus.accountants import PRVAccountant, RDPAccountant
             privacy["optimizer_steps"] = sum(n for _, _, n in engine.accountant.history)
+            rdp = RDPAccountant()
+            rdp.history = list(engine.accountant.history)
+            privacy["epsilon_rdp"] = rdp.get_epsilon(DELTA)
             try:
                 prv = PRVAccountant()
                 prv.history = list(engine.accountant.history)
@@ -585,6 +676,11 @@ def _run(cfg, splits, out, device, public=None):
         gg, pp, ll = predict(core, eval_loader(split), device)
         gg, pp = fix_truncation(gg, pp, splits[split])
         results[split] = {"losses": ll, "gold": gg, "pred": pp}
+    if canaries is not None:
+        cl = DataLoader(TokenDataset(canaries["all_split"], tok), batch_size=32, shuffle=False, collate_fn=collate)
+        _, _, closs = predict(core, cl, device)
+        with open(os.path.join(rdir, "canaries.json"), "w") as f:
+            json.dump({"included": canaries["included"], "loss": closs}, f)
     test_metrics = evaluate_tags(results["test"]["gold"], results["test"]["pred"])
     train_metrics = evaluate_tags(results["train"]["gold"], results["train"]["pred"], n_boot=0)
     val_metrics = evaluate_tags(results["validation"]["gold"], results["validation"]["pred"], n_boot=0)
@@ -664,7 +760,8 @@ def audit(splits, out):
 # ----------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plan", default="all", choices=["audit", "leakage", "repro", "main", "public", "public_pe", "all"])
+    ap.add_argument("--plan", default="all",
+                    choices=["audit", "leakage", "repro", "main", "public", "public_pe", "improve", "all"])
     ap.add_argument("--out", default="results")
     ap.add_argument("--only", default=None, help="comma-separated run names")
     ap.add_argument("--dp_lr", type=float, default=None, help="override the learning rate picked by the sweep")
@@ -688,7 +785,7 @@ def main():
             return
     only = set(a.only.split(",")) if a.only else None
     public = None
-    if a.plan in ("public", "all"):
+    if a.plan in ("public", "improve", "all"):
         # overlap is always checked against the FULL lg-ner corpus
         public = load_public(full_splits, os.path.join(a.out, "data_audit", "public_overlap.json"))
         if a.smoke:
@@ -728,6 +825,22 @@ def main():
     if a.plan in ("public_pe", "all"):
         go(plan_runs("public_pe", out=a.out))
         dp_stage("pub_pe_lrsweep", PE_LRS, "public_pe", "pub_lr", "pub_pe_dp_")
+    if a.plan == "improve":
+        go(plan_runs("improve", out=a.out))
+        best = select_dp_lr(a.out, "big_lrsweep", BIG_LRS, eps_tag="eps1")
+        if best is None:
+            print("big_lrsweep incomplete; DP runs not started.")
+            return
+        print(f"Selected DP learning rate for improve: {best[0]:g} (validation entity F1 {best[1]:.4f})")
+        with open(os.path.join(a.out, "selected_lr_improve.json"), "w") as f:
+            json.dump({"lr": best[0], "best_val_entity_f1": best[1], "selected_at_epsilon": 1.0}, f)
+        # the selected sweep run IS the eps = 1, seed 42 run of the final configuration: reuse it
+        import shutil
+        dst = os.path.join(a.out, "big_dp_eps1_seed42")
+        if not os.path.exists(os.path.join(dst, "metrics.json")):
+            shutil.copytree(os.path.join(a.out, f"big_lrsweep_eps1_lr{best[0]:g}"), dst, dirs_exist_ok=True)
+        go([r for r in plan_runs("improve", out=a.out, dp_lr=best[0]) if not r.get("sweep")
+            and r["name"] != "synth_warmstart" and not r["name"].startswith("syn_dp")])
     if a.plan in ("leakage", "repro", "all"):
         go(plan_runs("repro" if a.plan == "all" else a.plan, out=a.out))
 

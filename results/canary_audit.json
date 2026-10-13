@@ -1,0 +1,182 @@
+{
+ "canary2_dp_eps8_seed42": {
+  "canaries": 1000,
+  "included": 498,
+  "beta": 0.05,
+  "by_k": [
+   {
+    "k": 10,
+    "guesses": 20,
+    "correct": 14,
+    "accuracy": 0.7,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 25,
+    "guesses": 50,
+    "correct": 28,
+    "accuracy": 0.56,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 50,
+    "guesses": 100,
+    "correct": 59,
+    "accuracy": 0.59,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 100,
+    "guesses": 200,
+    "correct": 108,
+    "accuracy": 0.54,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 250,
+    "guesses": 500,
+    "correct": 251,
+    "accuracy": 0.502,
+    "eps_lower_bound": 0.0
+   }
+  ],
+  "eps_lower_bound": 0.0,
+  "best_k": 10,
+  "epsilon_upper_bound": 7.995837540263923
+ },
+ "canary2_nonprivate_seed42": {
+  "canaries": 1000,
+  "included": 498,
+  "beta": 0.05,
+  "by_k": [
+   {
+    "k": 10,
+    "guesses": 20,
+    "correct": 20,
+    "accuracy": 1.0,
+    "eps_lower_bound": 1.351215244109049
+   },
+   {
+    "k": 25,
+    "guesses": 50,
+    "correct": 50,
+    "accuracy": 1.0,
+    "eps_lower_bound": 2.338438242869744
+   },
+   {
+    "k": 50,
+    "guesses": 100,
+    "correct": 100,
+    "accuracy": 1.0,
+    "eps_lower_bound": 3.0548763458433625
+   },
+   {
+    "k": 100,
+    "guesses": 200,
+    "correct": 200,
+    "accuracy": 1.0,
+    "eps_lower_bound": 3.759602724130644
+   },
+   {
+    "k": 250,
+    "guesses": 500,
+    "correct": 499,
+    "accuracy": 0.998,
+    "eps_lower_bound": 4.314089871219236
+   }
+  ],
+  "eps_lower_bound": 4.314089871219236,
+  "best_k": 250,
+  "epsilon_upper_bound": null
+ },
+ "canary_dp_eps8_seed42": {
+  "canaries": 1000,
+  "included": 516,
+  "beta": 0.05,
+  "by_k": [
+   {
+    "k": 10,
+    "guesses": 20,
+    "correct": 9,
+    "accuracy": 0.45,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 25,
+    "guesses": 50,
+    "correct": 31,
+    "accuracy": 0.62,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 50,
+    "guesses": 100,
+    "correct": 60,
+    "accuracy": 0.6,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 100,
+    "guesses": 200,
+    "correct": 108,
+    "accuracy": 0.54,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 250,
+    "guesses": 500,
+    "correct": 257,
+    "accuracy": 0.514,
+    "eps_lower_bound": 0.0
+   }
+  ],
+  "eps_lower_bound": 0.0,
+  "best_k": 10,
+  "epsilon_upper_bound": 7.995837540263923
+ },
+ "canary_nonprivate_seed42": {
+  "canaries": 1000,
+  "included": 516,
+  "beta": 0.05,
+  "by_k": [
+   {
+    "k": 10,
+    "guesses": 20,
+    "correct": 15,
+    "accuracy": 0.75,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 25,
+    "guesses": 50,
+    "correct": 32,
+    "accuracy": 0.64,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 50,
+    "guesses": 100,
+    "correct": 61,
+    "accuracy": 0.61,
+    "eps_lower_bound": 0.0
+   },
+   {
+    "k": 100,
+    "guesses": 200,
+    "correct": 118,
+    "accuracy": 0.59,
+    "eps_lower_bound": 0.021792369945898293
+   },
+   {
+    "k": 250,
+    "guesses": 500,
+    "correct": 269,
+    "accuracy": 0.538,
+    "eps_lower_bound": 0.0
+   }
+  ],
+  "eps_lower_bound": 0.021792369945898293,
+  "best_k": 100,
+  "epsilon_upper_bound": null
+ }
+}

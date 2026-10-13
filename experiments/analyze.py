@@ -614,6 +614,92 @@ def main(res, tex):
     macros.setdefault("PubPeLR", "??")
     macros.setdefault("PubPeNTrainable", "??")
 
+    # ---------------------------------------------------------------- Experiment E: synthetic warm start + improved DP
+    EPS_TAGS = ((8, "EpsEight"), (3, "EpsThree"), (1, "EpsOne"), (0.5, "EpsHalf"))
+    sw = runs.get("synth_warmstart")
+    if sw:
+        macros.update(SynWarmF=f"{f1(sw):.3f}", SynWarmMacro=f"{sw['test']['entity_macro_f1']:.3f}",
+                      SynWarmMIA=f"{sw['mia_auc_train_vs_test']:.3f}")
+        for t in TYPES:
+            macros[f"SynWarm{t.title()}F"] = f"{sw['test']['per_type'][t]['f1']:.2f}"
+            macros[f"SynWarm{t.title()}R"] = f"{sw['test']['per_type'][t]['recall']:.2f}"
+    for eps, tag in ((8, "EpsEight"), (1, "EpsOne")):
+        m = runs.get(f"syn_dp_eps{eps:g}_seed42")
+        if m:
+            macros[f"Syn{tag}F"] = f"{f1(m):.3f}"
+            macros[f"Syn{tag}Macro"] = f"{m['test']['entity_macro_f1']:.3f}"
+    sel = os.path.join(res, "selected_lr_improve.json")
+    if os.path.exists(sel):
+        macros["BigLR"] = sci(json.load(open(sel))["lr"])
+    rows = []
+    for eps, tag in EPS_TAGS:
+        g = group(runs, f"big_dp_eps{eps:g}")
+        if not g:
+            continue
+        F = [f1(m) for m in g]
+        macros[f"Big{tag}F"] = f"{np.mean(F):.3f}"
+        macros[f"Big{tag}FPM"] = (f"{np.mean(F):.3f}~$\\pm$~{np.std(F, ddof=1):.3f}" if len(F) > 1
+                                  else f"{np.mean(F):.3f} (one seed)")
+        macros[f"Big{tag}Macro"] = f"{np.mean([m['test']['entity_macro_f1'] for m in g]):.3f}"
+        macros[f"Big{tag}R"] = f"{np.mean([m['test']['entity_micro']['recall'] for m in g]):.3f}"
+        macros[f"Big{tag}MIA"] = f"{np.mean([m['mia_auc_train_vs_test'] for m in g]):.3f}"
+        macros[f"Big{tag}Sigma"] = f"{g[0]['privacy']['noise_multiplier']:.3f}"
+        macros[f"Big{tag}PRV"] = f"{g[0]['privacy']['epsilon_prv']:.2f}"
+        macros[f"Big{tag}RDP"] = f"{g[0]['privacy']['epsilon_rdp']:.2f}"
+        macros[f"Big{tag}Seeds"] = str(len(g))
+        for t in TYPES:
+            macros[f"Big{tag}{t.title()}F"] = f"{np.mean([m['test']['per_type'][t]['f1'] for m in g]):.2f}"
+        old = group(runs, f"pub_dp_eps{eps:g}")
+        old_txt = ms([f1(m) for m in old]) if old else "--"
+        rows.append(f"{eps:g} & {old_txt} & {ms(F)} & {ms([m['test']['entity_macro_f1'] for m in g])} & "
+                    + " & ".join(f"{np.mean([m['test']['per_type'][t]['f1'] for m in g]):.2f}" for t in ("USERID", "DATE", "NORP"))
+                    + f" & {g[0]['privacy']['noise_multiplier']:.2f} & {g[0]['privacy']['epsilon_prv']:.2f} & "
+                    f"{ms([m['mia_auc_train_vs_test'] for m in g], 2)} \\\\")
+    if rows:
+        write(os.path.join(gen, "improve_results_table.tex"),
+              "\\begin{table}[ht]\n\\centering\n\\caption{Experiment E: DP fine-tuning from the public + synthetic warm start "
+              "with batch 256, 25 epochs and noise calibrated by the PRV accountant (Section~\\ref{sec:improve_design}), "
+              "against the warm-start DP models of Table~\\ref{tab:public_results}. Test set; mean $\\pm$ s.d.\\ over seeds "
+              "where more than one seed was run. $\\varepsilon$ is the PRV bound at $\\delta = 10^{-5}$.}\n"
+              "\\label{tab:improve_results}\n\\begin{FitTable}\n\\begin{tabular}{cccccccccc}\n\\toprule\n"
+              " & \\multicolumn{3}{c}{Micro-/macro-F1} & \\multicolumn{3}{c}{F1, new model} & & & \\\\\n"
+              "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\nTarget $\\varepsilon$ & Earlier & New (micro) & New (macro) & "
+              "USERID & DATE & NORP & $\\sigma$ & $\\varepsilon$ & MIA AUC \\\\\n\\midrule\n" + "\n".join(rows)
+              + "\n\\bottomrule\n\\end{tabular}\n\\end{FitTable}\n\\end{table}\n")
+    ap = os.path.join(res, "canary_audit.json")
+    if os.path.exists(ap):
+        au = json.load(open(ap))
+        for run, tag in (("canary2_nonprivate_seed42", "Np"), ("canary2_dp_eps8_seed42", "Dp"),
+                         ("canary_nonprivate_seed42", "TplNp"), ("canary_dp_eps8_seed42", "TplDp")):
+            if run in au:
+                a = au[run]
+                macros[f"Canary{tag}LB"] = f"{a['eps_lower_bound']:.2f}"
+                macros[f"Canary{tag}Acc"] = f"{max(r['accuracy'] for r in a['by_k']):.2f}"
+                full = max(a["by_k"], key=lambda r: r["guesses"])       # report the largest, pre-registered guess set
+                macros[f"Canary{tag}BestK"] = str(full["guesses"])
+                macros[f"Canary{tag}BestAcc"] = str(full["correct"])
+                macros[f"Canary{tag}F"] = f"{f1(runs[run]):.3f}" if run in runs else "??"
+    for _, tag in EPS_TAGS:
+        for suf in ("F", "FPM", "Macro", "R", "MIA", "Sigma", "PRV", "RDP", "Seeds") + tuple(f"{t.title()}F" for t in TYPES):
+            macros.setdefault(f"Big{tag}{suf}", "??")
+    for k in ("SynWarmF", "SynWarmMacro", "SynWarmMIA", "SynEpsEightF", "SynEpsEightMacro", "SynEpsOneF", "SynEpsOneMacro",
+              "BigLR") + tuple(f"SynWarm{t.title()}{m}" for t in TYPES for m in ("F", "R")) + tuple(
+              f"Canary{tag}{suf}" for tag in ("Np", "Dp", "TplNp", "TplDp") for suf in ("LB", "Acc", "BestK", "BestAcc", "F")):
+        macros.setdefault(k, "??")
+
+    # ---------------------------------------------------------------- v6's own (sub-token) metric, v6_metric.py
+    vp = os.path.join(res, "v6_metric.json")
+    if os.path.exists(vp):
+        vm = json.load(open(vp))
+        for key, tag in (("v6", "Vsix"), ("old_eps8", "OldEight"), ("big_eps8", "BigEight"), ("big_eps3", "BigThree"),
+                         ("big_eps1", "BigOne"), ("big_eps0.5", "BigHalf")):
+            if key in vm:
+                macros[f"VsixMetric{tag}"] = f"{vm[key]['v6_metric_f1']:.3f}"
+                macros[f"WordMetric{tag}"] = f"{vm[key]['word_level_f1']:.3f}"
+    for tag in ("Vsix", "OldEight", "BigEight", "BigThree", "BigOne", "BigHalf"):
+        macros.setdefault(f"VsixMetric{tag}", "??")
+        macros.setdefault(f"WordMetric{tag}", "??")
+
     # ---------------------------------------------------------------- hybrid: DP model + rules (hybrid_eval.py)
     hp = os.path.join(res, "hybrid", "hybrid.json")
     if os.path.exists(hp):
@@ -646,6 +732,12 @@ def main(res, tex):
                         f"{mo['entity_micro']['recall']:.3f} & {mh['entity_micro']['recall']:.3f} & "
                         f"{mo['per_type']['USERID']['f1']:.2f} $\\to$ {mh['per_type']['USERID']['f1']:.2f} & "
                         f"{mo['per_type']['DATE']['f1']:.2f} $\\to$ {mh['per_type']['DATE']['f1']:.2f} \\\\")
+        for eps, tag in ((8, "EpsEight"), (3, "EpsThree"), (1, "EpsOne"), (0.5, "EpsHalf")):
+            r = hy["runs"].get(f"big_dp_eps{eps:g}_seed42")
+            if r:
+                macros[f"HybBig{tag}BaseF"] = f"{r['model_only']['entity_micro']['f1']:.3f}"
+                macros[f"HybBig{tag}F"] = f"{r['model_plus_rules']['entity_micro']['f1']:.3f}"
+                macros[f"HybBig{tag}R"] = f"{r['model_plus_rules']['entity_micro']['recall']:.3f}"
         other = [hy["runs"][f"pub_dp_eps1_seed{s}"] for s in (1234, 2024) if f"pub_dp_eps1_seed{s}" in hy["runs"]]
         if other:
             macros["HybEpsOneOtherSeeds"] = " and ".join(
@@ -674,6 +766,9 @@ def main(res, tex):
                 macros.setdefault(f"Rules{tag}{t}{suf}", "??")
     macros.setdefault("HybStrategy", "??")
     macros.setdefault("HybEpsOneOtherSeeds", "??")
+    for tag in ("EpsEight", "EpsThree", "EpsOne", "EpsHalf"):
+        for suf in ("BaseF", "F", "R"):
+            macros.setdefault(f"HybBig{tag}{suf}", "??")
     stems = {"Base": "", "EpsEight": "", "EpsThree": "", "EpsOne": "", "PubBase": "", "PubEpsEight": "",
              "PubEpsThree": "", "PubEpsOne": ""}
     for s in stems:
