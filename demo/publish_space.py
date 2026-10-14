@@ -14,7 +14,8 @@ def main(repo):
     api = HfApi()
     print("signed in as", api.whoami()["name"])
     api.create_repo(repo, repo_type="space", space_sdk="static", exist_ok=True)
-    api.upload_folder(folder_path=SITE, repo_id=repo, repo_type="space",
+    # the browser models live in the model repositories (onnx/), not in the Space
+    api.upload_folder(folder_path=SITE, repo_id=repo, repo_type="space", ignore_patterns=["models/**"],
                       commit_message="Luganda PII detector demo (DP models, in-browser)")
     print("published", f"https://huggingface.co/spaces/{repo}")
 

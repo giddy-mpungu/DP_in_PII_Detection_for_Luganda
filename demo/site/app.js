@@ -2,9 +2,9 @@ import { AutoTokenizer, AutoModelForTokenClassification, Tensor, env } from "htt
 import { epsilon } from "./rdp.js";
 import { ruleSpans } from "./rules.js";
 
-env.allowRemoteModels = false;
-env.allowLocalModels = true;
-env.localModelPath = new URL("./models/", location.href).href;
+// the models are fetched from their Hugging Face repositories (onnx/model_quantized.onnx); text never leaves the browser
+env.allowRemoteModels = true;
+env.allowLocalModels = false;
 
 const TYPES = ["PERSON", "NORP", "DATE", "USERID", "ORG", "LOCATION"];
 const TYPE_LABEL = { PERSON: "Person", NORP: "Group / affiliation", DATE: "Date", USERID: "ID / phone / email",
@@ -24,8 +24,9 @@ async function getModel(e) {
       const opts = { dtype: "q8", device: "wasm", progress_callback: (p) => {
         if (p.status === "progress" && p.file.endsWith(".onnx")) setStatus(`Downloading the ε = ${e} model… ${Math.round(p.progress)}% (once; then cached)`);
       } };
-      const tok = await AutoTokenizer.from_pretrained(`eps${e}`);
-      const model = await AutoModelForTokenClassification.from_pretrained(`eps${e}`, opts);
+      const repo = DATA.models[e].repo;
+      const tok = await AutoTokenizer.from_pretrained(repo);
+      const model = await AutoModelForTokenClassification.from_pretrained(repo, opts);
       labels = model.config.id2label;
       return { tok, model };
     })();

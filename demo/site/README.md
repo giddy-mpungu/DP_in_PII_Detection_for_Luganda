@@ -14,11 +14,13 @@ A browser-only demo of the private models from the MSc dissertation *Differentia
 in Low-Resource Languages* (Gideon Mpungu, Makerere University, 2026).
 
 * Detection runs in the visitor's browser (transformers.js + ONNX Runtime Web); typed text is never uploaded.
-* `models/eps{8,3,1}/` are the released models [e4gl33y3/luganda-pii-dp-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps8),
-  [eps3](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps3) and [eps1](https://huggingface.co/e4gl33y3/luganda-pii-dp-eps1),
-  with weights stored as int8 plus per-channel scales (activations in float); test F1 is within 0.005 of the originals.
-* `rdp.js` is a line-by-line port of the Opacus RDP accountant; it reproduces the reported ε of every DP training run
-  to within 1e-7.
+* The page loads the browser copies (`onnx/model_quantized.onnx`) of the released v2 models
+  [e4gl33y3/luganda-pii-dp-v2-eps8](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps8),
+  [eps3](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps3), [eps1](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps1)
+  and [eps0.5](https://huggingface.co/e4gl33y3/luganda-pii-dp-v2-eps0.5): weights stored as int8 plus per-channel
+  scales (activations in float); test F1 within 0.003 of the full-precision models.
+* `rdp.js` is a line-by-line port of the Opacus RDP accountant; it reproduces the RDP ε of every DP training run
+  to within 1e-7 (the certified ε comes from the tighter PRV accountant used to calibrate the noise).
 * `rules.js` holds the rule-based ID and date recognisers.
 
 Code and results: https://github.com/giddy-mpungu/DP_in_PII_Detection_for_Luganda (folder `demo/`).
